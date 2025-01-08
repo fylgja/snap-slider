@@ -1,0 +1,36 @@
+{
+  "name": "@fylgja/snap-slider",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://fylgja.dev/",
+  "author": "Fylgja",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "unpkg": "dist/index.min.js",
+  "module": "dist/index.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.cjs"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fylgja/snap-slider"
+  },
+  "bugs": "https://github.com/fylgja/snap-slider/issues",
+  "keywords": [
+    "fylgja",
+    "slider",
+    "carousel",
+    "custom-element"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "node ./scripts/build.js"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.2"
+  }
+}

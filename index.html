@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Test - @fylgja/snap-slider</title>
+		<link href="https://unpkg.com/fylgja/fylgja.css" rel="stylesheet" />
+		<!-- <script defer src="https://unpkg.com/@fylgja/snap-slider"></script> -->
+		<script defer src="./dist/index.min.js"></script>
+	</head>
+	<body>
+		<main class="min-h-screen flex flex-col justify-center">
+			<a
+				href="https://fylgja.dev/"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="block py-8 mx-auto"
+			>
+				<img
+					src="https://raw.githubusercontent.com/fylgja/.github/main/assets/logo.svg"
+					alt="Fylgja CSS"
+					width="300"
+					height="130"
+				/>
+			</a>
+			<snap-slider class="block flow" style="--my: 3rem">
+				<div class="flex align flow-unset">
+					<h2>Snap Slider Title</h2>
+					<div class="flex gap">
+						<button data-prev hidden aria-label="Previous Slide">
+							←
+						</button>
+						<button data-next hidden aria-label="Next Slide">
+							→
+						</button>
+					</div>
+				</div>
+				<div
+					data-track
+					class="scroll-slider | snap scroll-x grid grid-flow gap flow-unset"
+					style="--md_grid-cols: 2; --lg_grid-cols: 3"
+				>
+					<figure
+						id="slide-1"
+						class="stack align"
+						style="--align-items: end center"
+					>
+						<img
+							src="https://picsum.photos/id/19/1200/800"
+							width="1200"
+							height="800"
+							alt="demo image"
+						/>
+						<figcaption style="--px: var(--size-4)">
+							Fylgja CSS Slider
+						</figcaption>
+					</figure>
+					<img
+						id="slide-2"
+						src="https://picsum.photos/id/34/1200/800"
+						width="1200"
+						height="800"
+						alt="demo image"
+					/>
+					<img
+						id="slide-3"
+						src="https://picsum.photos/id/42/1200/800"
+						width="1200"
+						height="800"
+						alt="demo image"
+					/>
+					<img
+						id="slide-4"
+						src="https://picsum.photos/id/72/1200/800"
+						width="1200"
+						height="800"
+						alt="demo image"
+					/>
+					<img
+						id="slide-5"
+						src="https://picsum.photos/id/94/1200/800"
+						width="1200"
+						height="800"
+						alt="demo image"
+					/>
+				</div>
+				<nav
+					data-pager
+					class="pager scroll-x snap"
+					style="--align: center; --my: var(--size-8));--btn-py: 0; --btn-px: 0;"
+				>
+					<a href="#slide-1" class="btn">
+						<img
+							src="https://picsum.photos/id/19/50/50"
+							width="50"
+							height="50"
+							alt="demo image"
+						/>
+					</a>
+					<a href="#slide-2" class="btn">
+						<img
+							src="https://picsum.photos/id/34/50/50"
+							width="50"
+							height="50"
+							alt="demo image"
+						/>
+					</a>
+					<a href="#slide-3" class="btn">
+						<img
+							src="https://picsum.photos/id/42/50/50"
+							width="50"
+							height="50"
+							alt="demo image"
+						/>
+					</a>
+					<a href="#slide-4" class="btn">
+						<img
+							src="https://picsum.photos/id/72/50/50"
+							width="50"
+							height="50"
+							alt="demo image"
+						/>
+					</a>
+					<a href="#slide-5" class="btn">
+						<img
+							src="https://picsum.photos/id/94/50/50"
+							width="50"
+							height="50"
+							alt="demo image"
+						/>
+					</a>
+				</nav>
+			</snap-slider>
+
+			<button onclick="addSlide()">Add Slide</button>
+			<script>
+				function addSlide() {
+					const newSlide = document.createElement("div");
+					newSlide.setAttribute("aria-label", "yo");
+					newSlide.textContent = "New Slide";
+					const trackElement = document.querySelector("[data-track]");
+					trackElement.appendChild(newSlide);
+				}
+			</script>
+		</main>
+	</body>
+</html>
