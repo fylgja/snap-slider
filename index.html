@@ -6,27 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Test - @fylgja/snap-slider</title>
 		<link href="https://unpkg.com/fylgja/fylgja.css" rel="stylesheet" />
-		<!-- <script defer src="https://unpkg.com/@fylgja/snap-slider"></script> -->
-		<script defer src="./dist/index.js"></script>
-		<script>
-			function addSlide() {
-				const randomNumber = Math.floor(Math.random() * 99) + 1;
-				const newSlide = document.createElement("img");
-				newSlide.setAttribute(
-					"src",
-					`https://picsum.photos/id/${randomNumber}/500/340`
-				);
-				newSlide.setAttribute("width", "500");
-				newSlide.setAttribute("height", "340");
-				newSlide.setAttribute("alt", "js slide added");
-				const trackElement = slimSlider.querySelector("[data-track]");
-				trackElement.appendChild(newSlide);
-			}
-
-			cssSlider.addEventListener("slideChange", (event) => {
-				console.log(event.detail);
-			});
-		</script>
+		<script defer src="https://unpkg.com/@fylgja/snap-slider"></script>
 	</head>
 	<body>
 		<main class="min-h-screen flex flex-col justify-center container">
@@ -96,4 +76,23 @@
 			</snap-slider>
 		</main>
 	</body>
+	<script>
+		function addSlide() {
+			const randomNumber = Math.floor(Math.random() * 99) + 1;
+			const newSlide = document.createElement("img");
+			newSlide.setAttribute(
+				"src",
+				`https://picsum.photos/id/${randomNumber}/500/340`
+			);
+			newSlide.setAttribute("width", "500");
+			newSlide.setAttribute("height", "340");
+			newSlide.setAttribute("alt", "js slide added");
+			const trackElement = slimSlider.querySelector("[data-track]");
+			trackElement.appendChild(newSlide);
+		}
+
+		slimSlider.addEventListener("slideChange", (event) => {
+			console.log(event.detail);
+		});
+	</script>
 </html>
