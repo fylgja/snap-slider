@@ -302,7 +302,7 @@ var SnapSlider = class extends HTMLElement {
   }
   groupPagerLinks() {
     const totalVisibleSlides = Math.round(
-      this.clientWidth / this.slides[0].clientWidth
+      this.offsetWidth / this.slides[0].offsetWidth
     );
     const pagerLinks = Array.from(this.pager.querySelectorAll("a, button"));
     pagerLinks.forEach((link, index) => {
