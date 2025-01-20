@@ -1,5 +1,3 @@
-// @ts-ignore
-
 const SnapSlider = class extends HTMLElement {
     static observedAttributes = ["data-slide-of-label", "slide-of-label"];
 
