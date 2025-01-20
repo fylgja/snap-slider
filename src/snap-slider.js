@@ -1,47 +1,156 @@
-class SnapSlider extends HTMLElement {
+// @ts-ignore
+
+const SnapSlider = class extends HTMLElement {
+    static observedAttributes = ["data-slide-of-label", "slide-of-label"];
+
     constructor() {
         super();
-        this.track = null;
-        this.prevBtn = null;
-        this.nextBtn = null;
-        this.pager = null;
-        this.slides = [];
-    }
+        this.initialLoad = true;
+        this.toPrevSlide = this.toPrevSlide.bind(this);
+        this.toNextSlide = this.toNextSlide.bind(this);
+        this.pagerClick = this.pagerClick.bind(this);
+        this.pagerKeydown = this.pagerKeydown.bind(this);
 
-    connectedCallback() {
         this.track = this.querySelector("[data-track]");
+        if (!this.track) {
+            return console.warn(
+                "No Slider track defined, reverting back to CSS slider.\nPlease create a wrapper element for your slides with the attribute data-track"
+            );
+        }
+
+        this.sliderLabel =
+            this.hasAttribute("aria-label") &&
+            this.getAttribute("aria-label")
+                .toLowerCase()
+                .trim()
+                .replace(/[^a-z0-9_-]+/g, "-")
+                .replace(/^-+|-+$/g, "");
+        this.sliderId = this.id || this.sliderLabel || "slider";
+
         this.prevBtn = this.querySelector("[data-prev]");
         this.nextBtn = this.querySelector("[data-next]");
         this.pager = this.querySelector("[data-pager]");
-        const useNavCreation =
-            this.getAttribute("use-nav") || this.getAttribute("data-use-nav");
+    }
 
-        if (!this.track) {
-            console.error(
-                "No Slider track defined, please create a wrapper element with the `data-track`"
-            );
-            return;
+    connectedCallback() {
+        const initOfLabel =
+            this.getAttribute("data-slide-of-label") ||
+            this.getAttribute("slide-of-label") ||
+            "of";
+        const initAutoPager =
+            this.hasAttribute("data-auto-pager") ||
+            this.hasAttribute("auto-pager");
+        const initGroupPager =
+            this.hasAttribute("data-group-pager") ||
+            this.hasAttribute("group-pager");
+        this.inViewObserver = null;
+        this.mutationObserver = null;
+        this.resizeObserver = null;
+        this.options = {
+            initOfText: initOfLabel,
+            ofText: initOfLabel,
+            autoPager: initAutoPager,
+            groupPager: initGroupPager || initAutoPager,
+        };
+        this.slides = this.getSlides();
+
+        if (this.options.autoPager) {
+            this.createPager();
+            this.pager = this.querySelector("[data-pager]");
+        } else if (this.pager) {
+            this.setupPager();
         }
 
-        if ((!this.prevBtn || !this.nextBtn) && useNavCreation !== "false") {
-            this.generateNavButtons();
+        if (this.pager) {
+            this.track.setAttribute("role", "tabpanel");
+            this.track.removeAttribute("aria-roledescription");
+            this.pager.addEventListener("click", this.pagerClick);
+            this.pager.addEventListener("keydown", this.pagerKeydown);
+
+            if (this.options.groupPager) {
+                this.setupResizeObserver();
+            }
         }
 
-        this.slides = Array.from(this.track.children);
-        this.setupAriaAttributes();
-        this.setupPagerLinks();
-        this.setupNavigationButtons();
+        this.setupWrapper();
+        this.setupSlides();
+        this.setupNavButtons();
         this.setupObservers();
         this.setupMutationObserver();
     }
 
-    refreshSlides() {
-        this.slides = Array.from(this.track.children);
-        this.setupObservers();
-        this.updatePager();
+    disconnectedCallback() {
+        if (this.inViewObserver) {
+            this.inViewObserver.disconnect();
+        }
+        if (this.mutationObserver) {
+            this.mutationObserver.disconnect();
+        }
+        if (this.resizeObserver) {
+            this.resizeObserver.disconnect();
+        }
+        if (this.prevBtn) {
+            this.prevBtn.removeEventListener("click", this.toPrevSlide);
+        }
+        if (this.nextBtn) {
+            this.nextBtn.removeEventListener("click", this.toNextSlide);
+        }
+        if (this.pager) {
+            this.pager.removeEventListener("click", this.pagerClick);
+            this.pager.removeEventListener("keydown", this.pagerKeydown);
+        }
     }
 
-    setupAriaAttributes() {
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (oldValue === null) return;
+
+        if (name === "data-slide-of-label" || name === "slide-of-label") {
+            this.options.initOfText = oldValue;
+            this.options.ofText = newValue;
+            this.setupSlides();
+        }
+    }
+
+    setupObservers() {
+        if (this.inViewObserver) {
+            this.inViewObserver.disconnect();
+        }
+
+        this.inViewObserver = new IntersectionObserver(
+            this.handleInView.bind(this),
+            {
+                root: this.track,
+                threshold: 0.5,
+            }
+        );
+
+        this.slides.forEach((slide) => this.inViewObserver.observe(slide));
+    }
+
+    setupMutationObserver() {
+        this.mutationObserver = new MutationObserver(
+            this.refreshSlides.bind(this)
+        );
+        this.mutationObserver.observe(this.track, {
+            childList: true,
+            subtree: false,
+        });
+    }
+
+    setupResizeObserver() {
+        this.resizeObserver = new ResizeObserver(
+            this.groupPagerLinks.bind(this)
+        );
+        this.resizeObserver.observe(this);
+    }
+
+    setupWrapper() {
+        const isInline = getComputedStyle(this).display === "inline";
+
+        if (isInline) {
+            this.style.display = "block";
+        }
+
         if (!this.hasAttribute("role")) {
             this.setAttribute("role", "region");
         }
@@ -58,235 +167,246 @@ class SnapSlider extends HTMLElement {
         this.track.setAttribute("aria-live", "polite");
     }
 
-    setupObservers() {
-        if (this.inViewObserver) {
-            this.inViewObserver.disconnect();
-        }
-
-        const observerOptions = { root: null, threshold: 0.5 };
-        this.inViewObserver = new IntersectionObserver(
-            this.handleInView.bind(this),
-            observerOptions
-        );
-
+    setupSlides() {
         this.slides.forEach((slide, index) => {
-            slide.setAttribute("aria-roledescription", "item");
+            const { initOfText, ofText } = this.options;
             const totalSlides = this.slides.length;
-            const currentSlideNumber = index + 1;
-            const ofText =
-                this.getAttribute("aria-slide-of-label") ||
-                this.getAttribute("data-aria-slide-of-label") ||
-                "of";
+            const currentSlide = index + 1;
             const existingLabel = slide.getAttribute("aria-label") || "";
+            const hasAutoLabel = existingLabel.startsWith(
+                `${currentSlide} ${initOfText} `
+            );
+            slide.setAttribute("aria-roledescription", "item");
 
-            if (
-                !slide.hasAttribute("aria-label") ||
-                existingLabel.startsWith(`${currentSlideNumber} ${ofText} `)
-            ) {
+            if (!slide.hasAttribute("id") && this.pager) {
                 slide.setAttribute(
-                    "aria-label",
-                    `${currentSlideNumber} ${ofText} ${totalSlides}`
+                    "id",
+                    `${this.sliderId}-item-${currentSlide}`
                 );
             }
 
-            this.inViewObserver.observe(slide);
-        });
-    }
-
-    setupMutationObserver() {
-        const mutationObserver = new MutationObserver(() => {
-            this.refreshSlides();
-        });
-
-        mutationObserver.observe(this.track, {
-            childList: true,
-            subtree: false,
-        });
-    }
-
-    handleInView(entries) {
-        entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-                entry.target.setAttribute("data-in-view", "");
-                entry.target.removeAttribute("inert", "");
-            } else {
-                entry.target.removeAttribute("data-in-view");
-                entry.target.setAttribute("inert", "");
+            if (!slide.hasAttribute("aria-label") || hasAutoLabel) {
+                slide.setAttribute(
+                    "aria-label",
+                    `${currentSlide} ${ofText} ${totalSlides}`
+                );
             }
         });
+    }
 
-        this.updatePager();
-        this.checkSliderBounds();
+    setupNavButtons() {
+        if (!this.prevBtn || !this.nextBtn) return;
+        this.prevBtn.removeAttribute("hidden");
+        this.nextBtn.removeAttribute("hidden");
+        this.prevBtn.addEventListener("click", this.toPrevSlide);
+        this.nextBtn.addEventListener("click", this.toNextSlide);
+    }
+
+    getSlides() {
+        if (!this.track) return [];
+        return Array.from(this.track.children).filter(
+            (child) => child.tagName.toLowerCase() !== "template"
+        );
     }
 
     getInViewItems() {
         const inViewSlides = this.track.querySelectorAll("[data-in-view]");
+        const firstInViewSlide = inViewSlides[0] || null;
+        const lastInViewSlide = inViewSlides[inViewSlides.length - 1] || null;
+        const isAtStart = firstInViewSlide === this.slides[0];
+        const isAtEnd = lastInViewSlide === this.slides[this.slides.length - 1];
+        const hasNoOverflow = isAtStart && isAtEnd;
+
         return {
-            length: inViewSlides.length,
-            first: inViewSlides[0],
-            last: inViewSlides[inViewSlides.length - 1],
-            all: inViewSlides,
+            inViewSlides,
+            totalInViewSlides: inViewSlides.length,
+            firstInViewSlide,
+            lastInViewSlide,
+            isAtStart,
+            isAtEnd,
+            hasNoOverflow,
         };
     }
 
     checkSliderBounds() {
-        const { first, last } = this.getInViewItems();
-        this.updateButtonState(this.prevBtn, first === this.slides[0]);
-        this.updateButtonState(
-            this.nextBtn,
-            last === this.slides[this.slides.length - 1]
+        const { isAtStart, isAtEnd, hasNoOverflow } = this.getInViewItems();
+
+        if (this.nextBtn) {
+            this.nextBtn.style.visibility = hasNoOverflow ? "hidden" : null;
+            isAtEnd
+                ? this.nextBtn.setAttribute("disabled", "")
+                : this.nextBtn.removeAttribute("disabled");
+        }
+
+        if (this.prevBtn) {
+            this.prevBtn.style.visibility = hasNoOverflow ? "hidden" : null;
+            isAtStart
+                ? this.prevBtn.setAttribute("disabled", "")
+                : this.prevBtn.removeAttribute("disabled");
+        }
+
+        if (this.pager) {
+            this.pager.style.visibility = hasNoOverflow ? "hidden" : null;
+        }
+    }
+
+    slideChange() {
+        this.dispatchEvent(
+            new CustomEvent("slideChange", { detail: this.getInViewItems() })
         );
     }
 
-    updateButtonState(button, isDisabled) {
-        if (!button) return;
-        isDisabled
-            ? button.setAttribute("disabled", "")
-            : button.removeAttribute("disabled");
+    handleInView(entries) {
+        entries.forEach((entry) => {
+            const marker =
+                this.pager &&
+                (this.pager.querySelector(`[href="#${entry.target.id}"]`) ||
+                    this.pager.querySelector(
+                        `[data-slide-id="${entry.target.id}"]`
+                    ));
+
+            if (entry.isIntersecting) {
+                entry.target.setAttribute("data-in-view", "");
+                entry.target.removeAttribute("inert", "");
+                marker?.setAttribute("aria-current", "true");
+                marker?.setAttribute("tabindex", "0");
+            } else {
+                entry.target.removeAttribute("data-in-view");
+                entry.target.setAttribute("inert", "");
+                marker?.setAttribute("aria-current", "false");
+                marker?.setAttribute("tabindex", "-1");
+            }
+        });
+
+        this.checkSliderBounds();
+
+        if (!this.initialLoad) {
+            this.slideChange();
+        } else {
+            this.initialLoad = false;
+        }
+
+        if (document.activeElement.parentElement.hasAttribute("data-pager")) {
+            const activeItems = this.pager.querySelectorAll('[tabindex="0"]');
+            if (activeItems.length) {
+                activeItems[0].focus();
+            }
+        }
     }
 
-    setupNavigationButtons() {
-        this.prevBtn?.removeAttribute("hidden");
-        this.nextBtn?.removeAttribute("hidden");
-
-        this.setupButton(this.prevBtn, "previous");
-        this.setupButton(this.nextBtn, "next");
+    refreshSlides() {
+        this.initialLoad = true;
+        this.slides = this.getSlides();
+        if (this.options.autoPager) {
+            this.createPager();
+            this.groupPagerLinks();
+        } else if (this.pager) {
+            this.setupPager();
+        }
+        this.setupSlides();
+        this.setupObservers();
     }
 
-    setupButton(button, direction) {
-        if (!button) return;
-        button.addEventListener("click", () => {
-            const { first, last } = this.getInViewItems();
-            const targetSlide =
-                direction === "previous"
-                    ? first.previousElementSibling
-                    : last.nextElementSibling;
-
-            targetSlide?.scrollIntoView({
-                block: "nearest",
-                inline: "nearest",
-                behavior: "smooth",
-            });
+    toNextSlide() {
+        const { lastInViewSlide } = this.getInViewItems();
+        const targetSlide = lastInViewSlide?.nextElementSibling;
+        targetSlide?.scrollIntoView({
+            block: "nearest",
+            inline: "start",
+            behavior: "smooth",
         });
     }
 
-    generateNavButtons() {
-        const navBtnContainer = document.createElement("div");
-        navBtnContainer.classList.add("flex", "align-center", "gap");
-
-        ["prev", "next"].forEach((dir) => {
-            const button = document.createElement("button");
-            button.setAttribute(`data-${dir}`, "");
-            button.setAttribute(
-                "aria-label",
-                dir === "prev" ? "Previous Slide" : "Next Slide"
-            );
-            button.textContent = dir === "prev" ? "←" : "→";
-            navBtnContainer.appendChild(button);
-        });
-
-        this.prevBtn = navBtnContainer.querySelector("[data-prev]");
-        this.nextBtn = navBtnContainer.querySelector("[data-next]");
-
-        this.insertAdjacentElement("beforeEnd", navBtnContainer);
-    }
-
-    updatePager() {
-        if (!this.pager) return;
-        const inViewItems = this.getInViewItems().all;
-        const pagerLinks = Array.from(this.pager.querySelectorAll("a, button"));
-
-        pagerLinks.forEach((link) => {
-            link.setAttribute("aria-current", "false");
-            link.setAttribute("tabindex", "-1");
-        });
-
-        inViewItems.forEach((visibleSlide) => {
-            const slideId = visibleSlide.id;
-
-            pagerLinks.forEach((link) => {
-                const linkId =
-                    link.getAttribute("href")?.slice(1) ||
-                    link.getAttribute("data-slide-id");
-                if (linkId === slideId) {
-                    link.setAttribute("aria-current", "true");
-                    link.setAttribute("tabindex", "0");
-                }
-            });
+    toPrevSlide() {
+        const { firstInViewSlide } = this.getInViewItems();
+        const targetSlide = firstInViewSlide?.previousElementSibling;
+        targetSlide?.scrollIntoView({
+            block: "nearest",
+            inline: "end",
+            behavior: "smooth",
         });
     }
 
-    setupPagerLinks() {
-        if (!this.pager) return;
+    createPager() {
+        const pager = document.createElement("nav");
+        pager.setAttribute("data-pager", "");
+        pager.setAttribute("role", "tablist");
+        pager.classList.add("pager");
 
-        this.track.setAttribute("role", "tabpanel");
-        this.track.removeAttribute("aria-roledescription");
+        this.slides.forEach((slide, index) => {
+            const marker = document.createElement("button");
+            const slideId = slide.id || `${this.sliderId}-item-${index + 1}`;
+            marker.setAttribute("data-slide-id", slideId);
+            this.setupPagerMarker(marker, index);
+            pager.appendChild(marker);
+        });
+
+        if (this.pager) {
+            this.pager.setAttribute("role", "tablist");
+            this.pager.replaceChildren(...pager.children);
+        } else {
+            this.appendChild(pager);
+        }
+    }
+
+    removePager() {
+        this.pager.replaceChildren();
+    }
+
+    setupPager() {
         this.pager.setAttribute("role", "tablist");
+        const items = Array.from(this.pager.querySelectorAll("a, button"));
+        items.forEach((marker, index) => this.setupPagerMarker(marker, index));
+    }
 
+    setupPagerMarker(marker, index) {
+        const slideId =
+            marker.getAttribute("href")?.slice(1) ||
+            marker.getAttribute("data-slide-id");
+        marker.setAttribute("role", "tab");
+        marker.setAttribute("aria-controls", slideId);
+        marker.setAttribute("aria-posinset", index + 1);
+        marker.setAttribute("aria-setsize", this.slides.length);
+        marker.setAttribute("tabindex", "-1");
+        if (!marker.hasAttribute("aria-label")) {
+            marker.setAttribute("aria-label", `Slide ${index + 1}`);
+        }
+    }
+
+    groupPagerLinks() {
+        const totalVisibleSlides = Math.round(
+            this.clientWidth / this.slides[0].clientWidth
+        );
         const pagerLinks = Array.from(this.pager.querySelectorAll("a, button"));
         pagerLinks.forEach((link, index) => {
-            link.setAttribute("role", "tab");
-
-            const slideId =
-                link.getAttribute("href")?.slice(1) ||
-                link.getAttribute("data-slide-id");
-            link.setAttribute("aria-controls", slideId);
-            link.setAttribute("aria-posinset", index + 1);
-            link.setAttribute("aria-setsize", this.slides.length);
-
-            if (!link.hasAttribute("aria-label")) {
-                link.setAttribute("aria-label", `Slide ${index + 1}`);
-            }
-        });
-
-        this.pager.addEventListener("click", (e) => {
-            const clickedButtonOrLink = e.target.closest("a, button");
-            if (!clickedButtonOrLink) return;
-            e.preventDefault();
-
-            const slideId =
-                clickedButtonOrLink.getAttribute("href")?.slice(1) ||
-                clickedButtonOrLink.getAttribute("data-slide-id");
-            const targetSlide = this.track.querySelector(`#${slideId}`);
-            if (!targetSlide) return;
-
-            targetSlide.scrollIntoView({
-                block: "nearest",
-                inline: "nearest",
-                behavior: "smooth",
-            });
-        });
-
-        this.pager.addEventListener("keydown", (e) => {
-            const currentActivePagerItem = document.activeElement;
-            if (
-                !currentActivePagerItem.parentElement.hasAttribute("data-pager")
-            )
-                return;
-            const { first, last } = this.getInViewItems();
-            let newActivePagerItem;
-            let targetSlide;
-
-            if (e.key === "ArrowRight") {
-                newActivePagerItem = currentActivePagerItem.nextElementSibling;
-                targetSlide = last.nextElementSibling;
-            } else if (e.key === "ArrowLeft") {
-                newActivePagerItem =
-                    currentActivePagerItem.previousElementSibling;
-                targetSlide = first.previousElementSibling;
-            }
-
-            if (newActivePagerItem) {
-                newActivePagerItem.focus();
-
-                targetSlide?.scrollIntoView({
-                    block: "nearest",
-                    inline: "nearest",
-                    behavior: "smooth",
-                });
-            }
+            link.style.display =
+                index % totalVisibleSlides === 0 ? null : "none";
         });
     }
-}
 
-customElements.define("snap-slider", SnapSlider);
+    pagerClick(event) {
+        const marker = event.target.closest("a, button");
+        if (!marker) return;
+
+        event.preventDefault();
+        const slideId =
+            marker.getAttribute("href")?.slice(1) ||
+            marker.getAttribute("data-slide-id");
+        const targetSlide = this.track.querySelector(`#${slideId}`);
+        targetSlide?.scrollIntoView({
+            block: "nearest",
+            inline: "start",
+            behavior: "smooth",
+        });
+    }
+
+    pagerKeydown(event) {
+        if (event.key === "ArrowRight") {
+            this.toNextSlide();
+        } else if (event.key === "ArrowLeft") {
+            this.toPrevSlide();
+        }
+    }
+};
+
+export default SnapSlider;

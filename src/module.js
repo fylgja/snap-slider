@@ -1,3 +1,3 @@
-import snapSlider from "./snap-slider.js";
+import SnapSlider from "./snap-slider.js";
 
-export default snapSlider;
+export default customElements.define("snap-slider", SnapSlider);
