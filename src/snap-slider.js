@@ -141,7 +141,9 @@ const SnapSlider = class extends HTMLElement {
     getSlides() {
         if (!this.track) return [];
         return Array.from(this.track.children).filter(
-            (child) => child.tagName.toLowerCase() !== "template"
+            (child) =>
+                child.tagName.toLowerCase() !== "template" &&
+                child.tagName.toLowerCase() !== "script"
         );
     }
 
