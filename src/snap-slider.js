@@ -37,6 +37,8 @@ const SnapSlider = class extends HTMLElement {
         this.refreshSlides();
         this.setupNav();
         this.setupEventListeners();
+        this.setupMutationObserver();
+        this.setupResizeObserver();
     }
 
     disconnectedCallback() {
