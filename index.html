@@ -5,16 +5,112 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Test - @fylgja/snap-slider</title>
-		<link href="https://unpkg.com/fylgja/fylgja.css" rel="stylesheet" />
-		<script defer src="https://unpkg.com/@fylgja/snap-slider"></script>
+		<link
+			href="https://cdn.jsdelivr.net/npm/@fylgja/base/index.min.css"
+			rel="stylesheet"
+		/>
+		<link
+			href="https://cdn.jsdelivr.net/npm/@fylgja/tokens/css/index.min.css"
+			rel="stylesheet"
+		/>
+		<link
+			href="https://cdn.jsdelivr.net/npm/@fylgja/utilities/index.min.css"
+			rel="stylesheet"
+		/>
+		<style>
+			:root {
+				--brand: hsl(260, 84%, 56%);
+				--on-brand: hsl(260, 0%, 100%);
+				--form-active-color: var(--brand);
+				--form-error-color: #e00;
+				--control-checked-stroke: var(--brand);
+				--control-checked-bg: var(--brand);
+				--control-checked-color: var(--on-brand);
+				color-scheme: light dark;
+				scrollbar-color: var(--scrollthumb-color, var(--brand))
+					var(--scrolltrack-color, transparent);
+				accent-color: var(--brand);
+				caret-color: var(--brand);
+				interpolate-size: allow-keywords;
+			}
+
+			::marker {
+				color: var(--brand);
+				font-weight: bolder;
+			}
+
+			::selection {
+				text-shadow: none;
+				background: var(--brand);
+				color: var(--on-brand);
+			}
+
+			:focus-visible {
+				outline-color: var(--brand);
+			}
+
+			:where(:not(h1, h2, h3, h4, h5, h6, strong) > a) {
+				font-weight: 500;
+			}
+
+			body {
+				display: flex;
+				flex-direction: column;
+			}
+			body > main {
+				flex-grow: 1;
+			}
+
+			.btn-primary,
+			.btn:where(.--primary),
+			:where([type="submit"], form button:not([type])),
+			:where(input[type="file"])::file-selector-button {
+				--btn-stroke: transparent;
+				--btn-bg: var(--brand);
+				--btn-color: var(--on-brand);
+				--btn-hover-bg: color-mix(in oklab, var(--brand) 80%, #000);
+				--btn-active-bg: color-mix(in oklab, var(--brand) 72%, #000);
+			}
+
+			:where(
+					.btn,
+					button,
+					[type="button"],
+					[type="submit"],
+					[type="reset"]
+				):has(:where(svg:only-child, img:only-child)) {
+				--btn-px: var(--btn-py, 0.375rem);
+			}
+
+			.pager {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				gap: var(--size-3);
+				padding-block: var(--size-3);
+				min-block-size: calc(
+					(var(--size-3) * 2) + (var(--btn-py, 0.375em) * 2) + 4px
+				);
+			}
+
+			.pager-item {
+				--btn-px: var(--btn-py, 0.375em);
+				--btn-active-stroke: var(--brand);
+				--btn-active-bg: var(--brand);
+			}
+		</style>
+		<!-- <script defer src="https://unpkg.com/@fylgja/snap-slider/dist/index.min.js"></script> -->
+		<!-- <script defer src="./dist/index.min.js"></script> -->
+		<script defer type="module" src="./src/cdn.js"></script>
 	</head>
 	<body>
-		<main class="min-h-screen flex flex-col justify-center container">
+		<main class="container flex-col align-center">
 			<a
 				href="https://fylgja.dev/"
 				target="_blank"
 				rel="noopener noreferrer"
-				class="block py-8 mx-auto"
+				class="block"
+				style="--mx: auto; --py: var(--size-8)"
 			>
 				<img
 					src="https://raw.githubusercontent.com/fylgja/.github/main/assets/logo.svg"
@@ -23,76 +119,200 @@
 					height="130"
 				/>
 			</a>
-
-			<snap-slider
-				id="slimSlider"
-				aria-label="Simple Slider"
-				data-auto-pager
-				data-slide-of-label="of"
-				class="flow"
+			<div
+				class="container"
+				style="
+					--py: var(--size-12);
+					--container-size: 68ch;
+					--container-gap: 0px;
+				"
 			>
-				<div class="flex align flow-unset">
-					<h2>Snap Slider</h2>
+				<div
+					class="relative rounded flow-none"
+					style="border-width: 2px"
+				>
+					<div
+						class="absolute rounded-inherit"
+						style="
+							--inset: 0;
+							border-width: inherit;
+							--size: 100%;
+							translate: -1em -1em;
+							--z: -1;
+						"
+					></div>
+					<pre
+						class="relative"
+						style="--code-stroke: transparent; --code-bg: #fff"
+					>
+<code>&lt;script src="//unpkg.com/@fylgja/snap-slider" defer&gt;&lt;/script&gt;</code>
+<code>&nbsp;</code>
+<code>&lt;snap-slider&gt;</code>
+<code>&nbsp;&nbsp;&nbsp;&nbsp;&lt;div data-track class="snap scroll-x flex gap"&gt;</code>
+<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Slides...</code>
+<code>&nbsp;&nbsp;&nbsp;&nbsp;&lt;/div&gt;</code>
+<code>&lt;/snap-slider&gt;</code></pre>
+				</div>
+			</div>
+			<snap-slider data-auto-pager class="w-full flex-none">
+				<div class="flex align justify-between items-center flow-unset">
+					<h2>Snap Slider Title</h2>
 					<div class="flex gap">
-						<button data-prev hidden aria-label="Previous Slide">
-							←
+						<button
+							data-prev
+							hidden
+							aria-label="Previous Slide"
+							class="btn --primary"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="24"
+								height="24"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path d="m12 19-7-7 7-7" />
+								<path d="M19 12H5" />
+							</svg>
 						</button>
-						<button data-next hidden aria-label="Next Slide">
-							→
+						<button
+							data-next
+							hidden
+							aria-label="Next Slide"
+							class="btn --primary"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="24"
+								height="24"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path d="M5 12h14" />
+								<path d="m12 5 7 7-7 7" />
+							</svg>
 						</button>
-						<button onclick="addSlide()">Add Slide</button>
 					</div>
 				</div>
 				<div
 					data-track
-					class="snap scroll-x grid grid-flow gap flow-unset"
-					style="--md_grid-cols: 2; --lg_grid-cols: 3"
+					class="snap scroll-x flex gap"
+					style="--snap-align: center"
 				>
 					<img
-						src="https://picsum.photos/id/11/500/340"
-						width="500"
-						height="340"
+						src="https://picsum.photos/id/1/740/380"
+						width="740"
+						height="380"
 						alt="demo image"
 					/>
 					<img
-						src="https://picsum.photos/id/15/500/340"
-						width="500"
-						height="340"
+						src="https://picsum.photos/id/2/780/380"
+						width="780"
+						height="380"
 						alt="demo image"
 					/>
 					<img
-						src="https://picsum.photos/id/19/500/340"
-						width="500"
-						height="340"
+						src="https://picsum.photos/id/3/780/380"
+						width="780"
+						height="380"
 						alt="demo image"
 					/>
 					<img
-						src="https://picsum.photos/id/23/500/340"
-						width="500"
-						height="340"
+						src="https://picsum.photos/id/4/780/380"
+						width="780"
+						height="380"
 						alt="demo image"
 					/>
+					<!-- Test for adding slides with JS -->
+					<template id="imageTemplate">
+						<img width="780" height="380" loading="lazy" />
+					</template>
+
+					<script>
+						function createImages() {
+							const indices = [5, 6, 7, 8];
+							const template =
+								document.getElementById("imageTemplate");
+
+							indices.forEach((index) => {
+								const clone = template.content.cloneNode(true);
+								const img = clone.querySelector("img");
+								img.src = `https://picsum.photos/id/${index}/780/380`;
+								img.alt = `demo image ${index}`;
+								template.parentNode.insertBefore(
+									clone,
+									template.nextSibling
+								); //insert after the template.
+							});
+						}
+
+						document.addEventListener(
+							"DOMContentLoaded",
+							createImages
+						);
+					</script>
 				</div>
+				<nav data-pager role="tablist" class="pager"></nav>
 			</snap-slider>
+			<blockquote>
+				<p>
+					This slider uses the same code as the example above, but
+					additionally includes the <code>auto-pager</code> modifier.
+					This modifier automatically creates the pagination dots
+					displayed below the slider.
+				</p>
+				<p>
+					If you wish to create your own pagination controls, add the
+					<code>[data-pager]</code> attribute to your pager container
+					element. Then, ensure each individual pager item (like an
+					anchor link <code>&lt;a&gt;</code> or button
+					<code>&lt;button&gt;</code>) targets the corresponding
+					slide's ID using either its <code>href</code> attribute (for
+					links) or a <code>[data-target-id]</code> attribute.
+				</p>
+				<p>
+					Furthermore, the buttons for handling navigation to the next
+					or previous slide are straightforward. Simply use a button
+					element with the <code>[data-prev]</code> attribute for the
+					"previous" functionality, and another with the
+					<code>[data-next]</code> attribute for the "next"
+					functionality.
+				</p>
+				<p>
+					Any other code presented in the examples primarily handles
+					visual styling. Snap Slider is designed as a CSS-first
+					component, which is then progressively enhanced with
+					JavaScript to enable features like navigation and
+					pagination.
+				</p>
+				<p>
+					This JavaScript implementation follows design principles and
+					options similar to the upcoming native CSS Only Carousel
+					features, as detailed in this article on the
+					<a
+						href="https://developer.chrome.com/blog/carousels-with-css?hl=en"
+						target="_blank"
+						rel="noopener noreferrer"
+						>Chrome Developers Blog</a
+					>.
+				</p>
+			</blockquote>
+			<p>
+				<em
+					>More Slider/Carousel examples are found on the
+					<a href="https://fylgja.dev/ui/"
+						>UI Components on Fylgja.dev</a
+					></em
+				>
+			</p>
 		</main>
 	</body>
-	<script>
-		function addSlide() {
-			const randomNumber = Math.floor(Math.random() * 99) + 1;
-			const newSlide = document.createElement("img");
-			newSlide.setAttribute(
-				"src",
-				`https://picsum.photos/id/${randomNumber}/500/340`
-			);
-			newSlide.setAttribute("width", "500");
-			newSlide.setAttribute("height", "340");
-			newSlide.setAttribute("alt", "js slide added");
-			const trackElement = slimSlider.querySelector("[data-track]");
-			trackElement.appendChild(newSlide);
-		}
-
-		slimSlider.addEventListener("slideChange", (event) => {
-			console.log(event.detail);
-		});
-	</script>
 </html>
