@@ -2,6 +2,7 @@
 
 [![NPM version](https://img.shields.io/npm/v/@fylgja/snap-slider?logo=npm)](https://www.npmjs.com/package/@fylgja/snap-slider)
 [![License](https://img.shields.io/github/license/@fylgja/snap-slider?color=%23234)](/LICENSE)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/1a127f61-d12b-46cf-858f-65a1350323e7/deploy-status)](https://app.netlify.com/sites/fylgja-snap-slider/deploys)
 
 A CSS-powered slider/carousel, enhanced with JavaScript for improved functionality and accessibility.
 

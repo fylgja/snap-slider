@@ -1,7 +1,7 @@
 {
   "name": "@fylgja/snap-slider",
   "version": "1.0.0",
-  "description": "",
+  "description": "A CSS-powered slider/carousel, enhanced with JavaScript for improved functionality and accessibility",
   "homepage": "https://fylgja.dev/",
   "author": "Fylgja",
   "license": "MIT",
