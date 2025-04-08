@@ -15,7 +15,7 @@ Integrate the Snap Slider into your project via NPM or CDN.
 
 Install the package and import it into your JavaScript bundle:
 
-```bash
+```sh
 npm install @fylgja/snap-slider
 ```
 
@@ -125,10 +125,8 @@ useful for integrating with CSS utility libraries.
     <div class="flex justify-between items-center gap-4">
         <h2 class="text-xl font-bold">Snap Slider Title</h2>
         <div class="flex gap-4">
-            <button data-prev hidden aria-label="Previous Slide" class="inline-flex justify-between items-center gap-2 px-2 py-1 border-2 border-blue-700 bg-blue-700 text-white hover:bg-blue-900 disabled:border-current disabled:bg-slate-500 disabled:text-slate-800 cursor-pointer"
-            >←</button>
-            <button data-next hidden aria-label="Next Slide" class="inline-flex justify-between items-center gap-2 px-2 py-1 border-2 border-blue-700 bg-blue-700 text-white hover:bg-blue-900 disabled:border-current disabled:bg-slate-500 disabled:text-slate-800 cursor-pointer"
-            >→</button>
+            <button data-prev hidden aria-label="Previous Slide" class="inline-flex justify-between items-center gap-2 px-2 py-1 border-2 border-blue-700 bg-blue-700 text-white hover:bg-blue-900 disabled:border-current disabled:bg-slate-500 disabled:text-slate-800 cursor-pointer">←</button>
+            <button data-next hidden aria-label="Next Slide" class="inline-flex justify-between items-center gap-2 px-2 py-1 border-2 border-blue-700 bg-blue-700 text-white hover:bg-blue-900 disabled:border-current disabled:bg-slate-500 disabled:text-slate-800 cursor-pointer">→</button>
         </div>
     </div>
     <div data-track class="snap-x overflow-x overscroll-x-contain grid grid-flow-col auto-cols-fr md:auto-cols-[repeat(2,minmax(0,1fr))] lg:auto-cols-[repeat(3,minmax(0,1fr))] gap-4">
