@@ -17,76 +17,11 @@
 			href="https://cdn.jsdelivr.net/npm/@fylgja/utilities/index.min.css"
 			rel="stylesheet"
 		/>
+		<link
+			href="https://cdn.jsdelivr.net/npm/@fylgja/base/theme.css"
+			rel="stylesheet"
+		/>
 		<style>
-			:root {
-				--brand: hsl(260, 84%, 56%);
-				--on-brand: hsl(260, 0%, 100%);
-				--form-active-color: var(--brand);
-				--form-error-color: #e00;
-				--control-checked-stroke: var(--brand);
-				--control-checked-bg: var(--brand);
-				--control-checked-color: var(--on-brand);
-				color-scheme: light dark;
-				scrollbar-color: var(--scrollthumb-color, var(--brand))
-					var(--scrolltrack-color, transparent);
-				accent-color: var(--brand);
-				caret-color: var(--brand);
-				interpolate-size: allow-keywords;
-			}
-
-			::marker {
-				color: var(--brand);
-				font-weight: bolder;
-			}
-
-			::selection {
-				text-shadow: none;
-				background: var(--brand);
-				color: var(--on-brand);
-			}
-
-			:focus-visible {
-				outline-color: var(--brand);
-			}
-
-			:where(:not(h1, h2, h3, h4, h5, h6, strong) > a) {
-				font-weight: 500;
-			}
-
-			blockquote,
-			hr {
-				border-color: var(--brand);
-			}
-
-			body {
-				display: flex;
-				flex-direction: column;
-			}
-			body > main {
-				flex-grow: 1;
-			}
-
-			.btn-primary,
-			.btn:where(.--primary),
-			:where([type="submit"], form button:not([type])),
-			:where(input[type="file"])::file-selector-button {
-				--btn-stroke: transparent;
-				--btn-bg: var(--brand);
-				--btn-color: var(--on-brand);
-				--btn-hover-bg: color-mix(in oklab, var(--brand) 80%, #000);
-				--btn-active-bg: color-mix(in oklab, var(--brand) 72%, #000);
-			}
-
-			:where(
-					.btn,
-					button,
-					[type="button"],
-					[type="submit"],
-					[type="reset"]
-				):has(:where(svg:only-child, img:only-child)) {
-				--btn-px: var(--btn-py, 0.375rem);
-			}
-
 			.pager {
 				display: flex;
 				justify-content: center;
@@ -137,18 +72,21 @@
 					style="border-width: 2px"
 				>
 					<div
-						class="absolute rounded-inherit"
+						class="absolute rounded-inherit w-full"
 						style="
-							--inset: 0;
-							border-width: inherit;
-							--size: 100%;
-							translate: -1em -1em;
 							--z: -1;
+							--inset: 0;
+							background-color: var(--surface-color);
+							border-width: inherit;
+							translate: -1em -1em;
 						"
 					></div>
 					<pre
 						class="relative"
-						style="--code-stroke: transparent; --code-bg: #fff"
+						style="
+							--code-stroke: transparent;
+							--code-bg: var(--surface-color);
+						"
 					>
 <code>&lt;script src="//unpkg.com/@fylgja/snap-slider" defer&gt;&lt;/script&gt;</code>
 <code>&nbsp;</code>
