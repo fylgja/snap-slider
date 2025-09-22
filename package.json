@@ -5,15 +5,21 @@
   "homepage": "https://fylgja.dev/",
   "author": "Fylgja",
   "license": "MIT",
-  "main": "dist/index.js",
+  "main": "dist/index.cjs",
   "unpkg": "dist/index.min.js",
-  "module": "dist/index.mjs",
+  "module": "dist/index.js",
   "exports": {
     ".": {
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs",
       "default": "./dist/index.cjs"
-    }
+    },
+    "./alpinejs": {
+      "import": "./dist/alpine.mjs",
+      "require": "./dist/alpine.cjs",
+      "default": "./dist/alpine.cjs"
+    },
+    "./*": "./*"
   },
   "repository": {
     "type": "git",
@@ -28,6 +34,7 @@
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "prebuid": "rm -rf ./dist",
     "build": "node ./scripts/build.js"
   },
   "devDependencies": {
