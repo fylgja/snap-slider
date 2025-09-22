@@ -61,8 +61,6 @@ Then, use the `<snap-slider>` element in your HTML. A `[data-track]` child eleme
 </snap-slider>
 ```
 
-The component enhances accessibility by managing `inert` attributes for off-screen slides and adding ARIA labels.
-
 ### AlpineJS Component
 
 To use the AlpineJS version, import the component and register it with Alpine:
@@ -87,90 +85,98 @@ Then, apply the `x-snap-slider` directive to your slider element.
 </div>
 ```
 
-### Styling and Functionality
+## Configuration
 
-While functional, the slider requires CSS for its visual presentation. The core principle is to leverage CSS for styling, with JavaScript providing progressive enhancements for functionality and accessibility.
+The `snap-slider` supports the following data attributes for configuration:
 
-You can enhance the slider with navigation buttons and pagination markers using specific data attributes.
+| Data Attribute | Description | Default |
+| --- | --- | --- |
+| `data-track` | **Required.** Identifies the container for the slider's slides. | |
+| `data-next` | Designates a button to navigate to the next slide. | |
+| `data-prev` | Designates a button to navigate to the previous slide. | |
+| `data-pager` | Designates the container for pagination markers. | |
+| `data-auto-pager` | Automatically generates pagination markers. | `false` |
+| `data-group-pager` | Groups pager markers based on the number of visible slides. | `false` |
+| `data-slide-label-sepparator` | Customizes the separator in the `aria-label` for slides (e.g., "1 of 12"). | `of` |
+| `data-pager-class` | Sets custom classes for the pager container. | `pager` |
+| `data-marker-class` | Sets custom classes for the pager markers. | `pager-item` |
 
-### Configuration Options
+### AlpineJS Configuration
 
-The `snap-slider` supports the following data attributes:
-
-| Data Attribute           | Description                                                                  |
-| ------------------------ | ---------------------------------------------------------------------------- |
-| `track`                  | Identifies the container for the slider's slides.                            |
-| `next`                   | Triggers navigation to the next slide.                                       |
-| `prev`                   | Triggers navigation to the previous slide.                                   |
-| `pager`                  | Designates the container for pagination markers.                             |
-| `auto-pager`             | Automatically generates pagination markers.                                  |
-| `slide-label-sepparator` | Allows customization of the separator used in slide labels (e.g., "1 of *"). |
-
-> [!note]
-> All options are implemented via data attributes (e.g., `[data-track]`).
-
-#### Custom Pager Implementation
-
-To create a custom pager, each slide must have a unique ID. These IDs are then linked to pager markers using either anchor links (`href` with a hash) or buttons with the `[data-target-id]` attribute.
-
-The slider intelligently hides pager markers when multiple slides are visible, ensuring a clean interface. This behavior also applies to the auto-pager option.
-
-Styling the pager markers is entirely customizable.
-
-#### Auto Pager Feature
-
-The `data-auto-pager` attribute automatically generates a pager after the track element.
-
-To customize the pager's location, include an empty `[data-pager]` container within the `snap-slider`.
+For the AlpineJS version, boolean options like `auto-pager` and `group-pager` are passed as modifiers to the `x-snap-slider` directive:
 
 ```html
-<snap-slider data-auto-pager>
-    <div data-track>
-        <!-- Slides here go here -->
-    </div>
-    <!-- Other HTML -->
-     <div data-pager></div>
-</snap-slider>
+<div x-data x-snap-slider.auto-pager.group-pager>
+    ...
+</div>
 ```
 
-Reserve space for the pager by setting a `min-height` to prevent layout shifts.
+Other data attributes can be applied directly to the element as usual.
 
-Customize the pager's appearance using the default `.pager` and `.marker` classes
-or by applying custom classes via `data-pager-classes` and `data-marker-classes`,
-useful for integrating with CSS utility libraries.
+### Pager
 
-### Example Fylgja CSS
+You can add a pager to your slider in two ways:
 
-```html
-<snap-slider data-auto-pager>
-    <div class="flex gap align flow-unset">
-        <h2>Snap Slider Title</h2>
-        <div class="flex gap">
-            <button data-prev hidden aria-label="Previous Slide" class="btn --primary">←</button>
-            <button data-next hidden aria-label="Next Slide" class="btn --primary">→</button>
-        </div>
-    </div>
-    <div data-track class="snap scroll-x grid-cols grid-flow gap" style="--md_grid-cols: 2; --lg_grid-cols: 3">
-        <!-- Slides here go here -->
-    </div>
-    <nav data-pager role="tablist" class="pager"></nav>
-</snap-slider>
+#### 1. Auto Pager
+
+The easiest way to add a pager is by using the `data-auto-pager` attribute (or `x-snap-slider.auto-pager` for AlpineJS). This will automatically generate a pager for you.
+
+By default, the pager is inserted after the `[data-track]` element. You can customize its location by adding an empty `[data-pager]` container anywhere inside the slider element.
+
+#### 2. Custom Pager
+
+For more control, you can create a custom pager. Each slide must have a unique ID, and each pager marker must link to a slide's ID using `href="#slide-id"` or `data-target-id="slide-id"`.
+
+### Group Pager
+
+When multiple slides are visible at once, you can use the `data-group-pager` attribute (or `x-snap-slider.group-pager` for AlpineJS) to group the pager markers. This will only show one marker for each visible group of slides.
+
+## JavaScript API
+
+You can interact with the slider programmatically using the following methods and events.
+
+### Methods
+
+First, get the `SnapSlider` instance:
+
+**For the Custom Element:**
+```js
+const snapSliderElement = document.querySelector('snap-slider');
+const snapSliderInstance = snapSliderElement.slider;
 ```
 
-### Example Tailwind CSS
+**For the AlpineJS component:**
 
-```html
-<snap-slider data-auto-pager data-marker-class="size-4 border-2 rounded-full aria-current:bg-blue-700 aria-current:border-blue-700">
-    <div class="flex justify-between items-center gap-4">
-        <h2 class="text-xl font-bold">Snap Slider Title</h2>
-        <div class="flex gap-4">
-            <button data-prev hidden aria-label="Previous Slide" class="inline-flex justify-between items-center gap-2 px-2 py-1 border-2 border-blue-700 bg-blue-700 text-white hover:bg-blue-900 disabled:border-current disabled:bg-slate-500 disabled:text-slate-800 cursor-pointer">←</button>
-            <button data-next hidden aria-label="Next Slide" class="inline-flex justify-between items-center gap-2 px-2 py-1 border-2 border-blue-700 bg-blue-700 text-white hover:bg-blue-900 disabled:border-current disabled:bg-slate-500 disabled:text-slate-800 cursor-pointer">→</button>
-        </div>
-    </div>
-    <div data-track class="snap-x overflow-x overscroll-x-contain grid grid-flow-col auto-cols-fr md:auto-cols-[repeat(2,minmax(0,1fr))] lg:auto-cols-[repeat(3,minmax(0,1fr))] gap-4">
-        <!-- Slides here go here -->
-    </div>
-    <nav data-pager role="tablist" class="flex flex-wrap justify-center items-center gap-2"></nav>
-</snap-slider>
+```js
+const sliderEl = document.querySelector('[x-snap-slider]');
+const snapSliderInstance = sliderEl.snapSlider;
 ```
+
+| Method | Description |
+| --- | --- |
+| `init()` | Initializes the slider. This is called automatically. |
+| `destroy()` | Removes all event listeners and observers. |
+| `refreshSlides()` | Re-initializes the slider, useful when slides are added or removed dynamically. |
+
+### Events
+
+The slider dispatches a `slideChange` event on the slider element whenever the in-view slides change.
+
+```js
+const sliderEl = document.querySelector('snap-slider'); // Or '[x-snap-slider]'
+sliderEl.addEventListener('slideChange', (event) => {
+    console.log(event.detail);
+});
+```
+
+The `event.detail` object contains the following properties:
+
+| Property | Description |
+| --- | --- |
+| `inViewSlides` | An array of the slides currently in view. |
+| `totalInViewSlides` | The total number of slides in view. |
+| `firstInViewSlide` | The first slide in view. |
+| `lastInViewSlide` | The last slide in view. |
+| `isAtStart` | A boolean indicating if the slider is at the beginning. |
+| `isAtEnd` | A boolean indicating if the slider is at the end. |
+| `hasNoOverflow` | A boolean indicating if all slides are visible at once. |
