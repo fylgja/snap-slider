@@ -6,54 +6,92 @@
 
 A CSS-powered slider/carousel, enhanced with JavaScript for improved functionality and accessibility.
 
-**Live Demo:** [https://fylgja-snap-slider.netlify.app/](https://fylgja-snap-slider.netlify.app/)
+The Snap Slider is available as a Custom Element (the primary and recommended way) or as an AlpineJS component.
+
+**Custom Element Live Demo:** [https://fylgja-snap-slider.netlify.app/](https://fylgja-snap-slider.netlify.app/)
+**AlpineJS Live Demo:** [https://fylgja-snap-slider.netlify.app/alpine.html](https://fylgja-snap-slider.netlify.app/alpine.html)
 
 ## Installation
 
-Integrate the Snap Slider into your project via NPM or CDN.
+The Snap Slider can be integrated into your project via NPM or by using a CDN.
 
 ### NPM Installation
 
-Install the package and import it into your JavaScript bundle:
+Install the package from NPM:
 
 ```sh
 npm install @fylgja/snap-slider
 ```
 
-```js
-import '@fylgja/snap-slider';
-```
-
 ### CDN Integration
 
-Include the script directly in your HTML using a `<script>` tag:
+Alternatively, you can include the script directly in your HTML using a `<script>` tag.
+
+**For the Custom Element:**
 
 ```html
-<script defer src="https://unpkg.com/@fylgja/snap-slider/dist/index.min.js"></script>
+<script defer src="https://unpkg.com/@fylgja/snap-slider/dist/custom-element/cdn.min.js"></script>
+```
+
+**For the AlpineJS version:**
+
+```html
+<script defer src="https://unpkg.com/@fylgja/snap-slider/dist/alpine/cdn.min.js"></script>
 ```
 
 ## Usage
 
-Utilize the `snap-slider` custom element as you would any standard HTML tag.
+The Snap Slider can be used as a Custom Element or as an AlpineJS component.
 
-A `[data-track]` child element is mandatory for slide containment.
+### Custom Element (Recommended)
+
+Import the custom element into your project:
+
+```js
+import '@fylgja/snap-slider/custom-element';
+```
+
+Then, use the `<snap-slider>` element in your HTML. A `[data-track]` child element is required to contain the slides.
 
 ```html
 <snap-slider>
     <div data-track>
-        <!-- Slides here go here -->
+        <!-- Your slides go here -->
     </div>
 </snap-slider>
 ```
 
-While functional, the slider requires CSS styling for visual presentation.
-
 The component enhances accessibility by managing `inert` attributes for off-screen slides and adding ARIA labels.
 
-Enhance the slider with navigation buttons and pagination markers using specific data attributes.
+### AlpineJS Component
 
-**Key Principle:** The slider leverages CSS for styling,
-with JavaScript providing progressive enhancement for functionality and accessibility.
+To use the AlpineJS version, import the component and register it with Alpine:
+
+```js
+import Alpine from 'alpinejs';
+import snapSlider from '@fylgja/snap-slider/alpine';
+
+window.Alpine = Alpine;
+
+Alpine.plugin(snapSlider);
+Alpine.start();
+```
+
+Then, apply the `x-snap-slider` directive to your slider element.
+
+```html
+<div x-data x-snap-slider>
+    <div data-track>
+        <!-- Your slides go here -->
+    </div>
+</div>
+```
+
+### Styling and Functionality
+
+While functional, the slider requires CSS for its visual presentation. The core principle is to leverage CSS for styling, with JavaScript providing progressive enhancements for functionality and accessibility.
+
+You can enhance the slider with navigation buttons and pagination markers using specific data attributes.
 
 ### Configuration Options
 
@@ -73,7 +111,7 @@ The `snap-slider` supports the following data attributes:
 
 #### Custom Pager Implementation
 
-To create a custom pager, each slide must have a unique identifier (ID). These IDs are then linked to pager markers using either anchor links (`href` with a hash) or buttons with the `[data-target-id]` attribute.
+To create a custom pager, each slide must have a unique ID. These IDs are then linked to pager markers using either anchor links (`href` with a hash) or buttons with the `[data-target-id]` attribute.
 
 The slider intelligently hides pager markers when multiple slides are visible, ensuring a clean interface. This behavior also applies to the auto-pager option.
 

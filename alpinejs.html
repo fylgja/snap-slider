@@ -44,8 +44,8 @@
 				}
 			}
 		</style>
-		<script defer src="./dist/custom-element/cdn.min.js"></script>
-		<!-- <script defer type="module" src="./src/custom-element/cdn.js"></script> -->
+		<script defer src="./dist/alpine/cdn.min.js"></script>
+		<script defer src="//unpkg.com/alpinejs"></script>
 		<script>
 			document.addEventListener("click", (e) => {
 				const triggerName = "data-action-add-slide";
@@ -126,23 +126,25 @@
 							--code-bg: var(--surface-color);
 						"
 					>
-<code>&lt;script src="//unpkg.com/@fylgja/snap-slider" defer&gt;&lt;/script&gt;</code>
+<code>&lt;script src="//unpkg.com/@fylgja/snap-slider/dist/alpine.min.js" defer&gt;&lt;/script&gt;</code>
+<code>&lt;script src="//unpkg.com/alpinejs" defer&gt;&lt;/script&gt;</code>
 <code>&nbsp;</code>
-<code>&lt;snap-slider&gt;</code>
+<code>&lt;section x-data x-snap-slider&gt;</code>
 <code>&nbsp;&nbsp;&nbsp;&nbsp;&lt;div data-track class="snap scroll-x flex gap"&gt;</code>
 <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Slides...</code>
 <code>&nbsp;&nbsp;&nbsp;&nbsp;&lt;/div&gt;</code>
-<code>&lt;/snap-slider&gt;</code></pre>
+<code>&lt;/section&gt;</code></pre>
 				</div>
 			</div>
-			<snap-slider
-				id="snapSliderElement"
-				data-auto-pager
-				data-group-pager
-				class="block w-full"
+			<section
+				id="snapSliderAlpine"
+				x-data
+				x-snap-slider.auto-pager.group-pager
+				aria-labelledby="slider-title"
+				class="w-full"
 			>
 				<div class="flex align justify-between items-center flow-unset">
-					<h2>Custom Element Snap Slider</h2>
+					<h2 id="slider-title">Alpine Snap Slider</h2>
 					<div class="flex gap">
 						<button
 							data-prev
@@ -186,7 +188,7 @@
 								<path d="m12 5 7 7-7 7" />
 							</svg>
 						</button>
-						<button data-action-add-slide="snapSliderElement">
+						<button data-action-add-slide="snapSliderAlpine">
 							Add slide
 						</button>
 					</div>
@@ -205,9 +207,9 @@
 						"
 					>
 						Powered by
-						<code>&lt;snap-slider&gt;</code>
-						<a href="/alpinejs.html">
-							Or view the AlpineJS version
+						<code>[x-snap-slider]</code>
+						<a href="/index.html">
+							Or view the Custom Element version
 						</a>
 					</div>
 					<img
@@ -247,16 +249,17 @@
 					/>
 				</div>
 				<nav data-pager role="tablist" class="pager"></nav>
-			</snap-slider>
+			</section>
 			<blockquote
 				class="container"
 				style="--container-size: 68ch; --container-gap: 0px"
 			>
 				<p>
-					Meet <code>snap-slider</code>, an custom html element that
+					Meet <code>x-snap-slider</code>, an Alpine.js plugin that
 					enhances native CSS scroll snap sliders. Wrap the
-					<code>snap-slider</code> around your scroll container to add
-					features like next/prev buttons and pagination.
+					<code>x-snap-slider</code> directive around your scroll
+					container to add features like next/prev buttons and
+					pagination.
 				</p>
 				<p>
 					<a
