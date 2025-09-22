@@ -16,12 +16,12 @@ var __copyProps = (to, from, except, desc) => {
 };
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-// src/index.js
-var index_exports = {};
-__export(index_exports, {
-  default: () => index_default
+// src/alpine/module.js
+var module_exports = {};
+__export(module_exports, {
+  default: () => alpineSnapSlider
 });
-module.exports = __toCommonJS(index_exports);
+module.exports = __toCommonJS(module_exports);
 
 // src/snap-slider.js
 var SnapSlider = class {
@@ -341,5 +341,14 @@ var SnapSlider = class {
   }
 };
 
-// src/index.js
-var index_default = SnapSlider;
+// src/alpine/module.js
+function alpineSnapSlider(Alpine) {
+  Alpine.directive("snap-slider", (el, { modifiers }, { cleanup }) => {
+    const autoPager = modifiers.includes("auto-pager");
+    const groupPager = modifiers.includes("group-pager");
+    const slider = new SnapSlider(el, { autoPager, groupPager });
+    cleanup(() => {
+      slider.destroy();
+    });
+  });
+}
