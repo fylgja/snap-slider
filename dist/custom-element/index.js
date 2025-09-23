@@ -328,7 +328,4 @@ var SnapSliderElement = class extends HTMLElement {
     }
   }
 };
-var module_default = customElements.define("snap-slider", SnapSliderElement);
-export {
-  module_default as default
-};
+customElements.define("snap-slider", SnapSliderElement);

@@ -17,4 +17,4 @@ class SnapSliderElement extends HTMLElement {
     }
 }
 
-export default customElements.define("snap-slider", SnapSliderElement);
+customElements.define("snap-slider", SnapSliderElement);
