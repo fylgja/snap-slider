@@ -1,23 +1,29 @@
 {
   "name": "@fylgja/snap-slider",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "A CSS-powered slider/carousel, enhanced with JavaScript for improved functionality and accessibility",
   "homepage": "https://fylgja.dev/",
   "author": "Fylgja",
   "license": "MIT",
   "main": "dist/index.cjs",
-  "unpkg": "dist/index.min.js",
   "module": "dist/index.js",
+  "unpkg": "dist/custom-element/index.min.js",
+  "jsdelivr": "dist/custom-element/index.min.js",
   "exports": {
     ".": {
-      "import": "./dist/index.mjs",
+      "import": "./dist/index.js",
       "require": "./dist/index.cjs",
       "default": "./dist/index.cjs"
     },
-    "./alpinejs": {
-      "import": "./dist/alpine.mjs",
-      "require": "./dist/alpine.cjs",
-      "default": "./dist/alpine.cjs"
+    "./custom-element": {
+      "import": "./dist/custom-element/index.js",
+      "require": "./dist/custom-element/index.cjs",
+      "default": "./dist/custom-element/index.cjs"
+    },
+    "./alpine": {
+      "import": "./dist/alpine/index.js",
+      "require": "./dist/alpine/index.cjs",
+      "default": "./dist/alpine/index.cjs"
     },
     "./*": "./*"
   },
