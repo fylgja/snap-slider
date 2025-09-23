@@ -1,48 +1,55 @@
 // src/snap-slider.js
-var SnapSlider = class extends HTMLElement {
-  constructor() {
-    super();
-    this.attachShadow({ mode: "open" });
-    this.shadowRoot.innerHTML = "<style>:host{display:block}</style><slot></slot>";
-    this.track = null;
-    this.pager = null;
-    this.slides = [];
-    this.inViewObserver = null;
-    this.mutationObserver = null;
-    this.resizeObserver = null;
-    this.navBtns = [];
-    this.initialLoad = true;
-    this.slideLabelSepparator = this.dataset.slideLabelSepparator || "of";
-    this.useAutoPager = this.hasAttribute("data-auto-pager");
-    this.sliderLabel = this.getAttribute("aria-label")?.toLowerCase().trim().replace(/[^a-z0-9_-]+/g, "-").replace(/^-+|-+$/g, "");
-    this.sliderId = this.id || this.sliderLabel || "slider";
-    this.markerIdName = "data-target-id";
-    this.pagerClasses = this.dataset.pagerClass || "pager";
-    this.markerClasses = this.dataset.markerClass || "pager-item";
-  }
-  connectedCallback() {
-    this.track = this.querySelector("[data-track]");
+var SnapSlider = class {
+  constructor(el, { labelSepparator = "of", autoPager, groupPager } = {}) {
+    this.el = el;
+    this.track = this.el.querySelector("[data-track]");
     if (!this.track) {
       console.warn(
-        "No Slider track defined, reverting back to CSS slider.\nPlease create a wrapper element for your slides with the attribute data-track"
+        "No Slider track defined, reverting back to CSS slider.\nPlease create a wrapper for your slides with the attribute data-track",
+        this.el
       );
       return;
     }
-    this.pager = this.querySelector("[data-pager]");
+    this.initialLoad = true;
+    this.pager = this.el.querySelector("[data-pager]");
+    this.slides = [];
+    this.inViewObserver;
+    this.mutationObserver;
+    this.resizeObserver;
     this.navBtns = Array.from(
-      this.querySelectorAll("[data-next], [data-prev]")
+      this.el.querySelectorAll("[data-next], [data-prev]")
     );
-    this.refreshSlides();
+    this.slideLabelSepparator = this.el.dataset.slideLabelSepparator || labelSepparator;
+    this.useAutoPager = autoPager || this.el.hasAttribute("data-auto-pager") || false;
+    this.useGroupPager = groupPager || this.el.hasAttribute("data-group-pager") || false;
+    this.sliderLabel = this.el.hasAttribute("aria-label") && this.el.getAttribute("aria-label").toLowerCase().trim().replace(/[^a-z0-9_-]+/g, "-").replace(/^-+|-+$/g, "");
+    this.sliderId = this.el.id || this.sliderLabel || "slider";
+    this.markerIdName = "data-target-id";
+    this.pagerClasses = this.el.dataset.pagerClass || "pager";
+    this.markerClasses = this.el.dataset.markerClass || "pager-item";
+    this.init();
+  }
+  init() {
+    this.setupSlides();
     this.setupNav();
-    this.setupEventListeners();
+    if (this.useAutoPager) {
+      this.createPager();
+    } else {
+      this.setupPager();
+    }
+    this.setupObservers();
     this.setupMutationObserver();
     this.setupResizeObserver();
+    this.el.addEventListener("click", this.eventHandler.bind(this));
+    this.el.addEventListener("keydown", this.eventHandler.bind(this));
   }
-  disconnectedCallback() {
-    this.inViewObserver?.disconnect();
-    this.mutationObserver?.disconnect();
-    this.resizeObserver?.disconnect();
-    this.removeEventListeners();
+  destroy() {
+    var _a, _b, _c;
+    (_a = this.inViewObserver) == null ? void 0 : _a.disconnect();
+    (_b = this.mutationObserver) == null ? void 0 : _b.disconnect();
+    (_c = this.resizeObserver) == null ? void 0 : _c.disconnect();
+    this.el.removeEventListener("click", this.eventHandler.bind(this));
+    this.el.removeEventListener("keydown", this.eventHandler.bind(this));
   }
   roundUpIfGreaterThan(number, min = 8) {
     const decimalPart = number - Math.floor(number);
@@ -65,7 +72,7 @@ var SnapSlider = class extends HTMLElement {
     };
   }
   groupPagerMarkers() {
-    if (!this.pager) return;
+    if (!this.pager || !this.useGroupPager) return;
     const totalVisibleSlides = this.roundUpIfGreaterThan(
       this.track.offsetWidth / this.slides[0].offsetWidth
     );
@@ -81,8 +88,8 @@ var SnapSlider = class extends HTMLElement {
       ));
       entry.target.toggleAttribute("data-in-view", entry.isIntersecting);
       entry.target.toggleAttribute("inert", !entry.isIntersecting);
-      marker?.setAttribute("aria-current", entry.isIntersecting);
-      marker?.setAttribute("tabindex", entry.isIntersecting ? "0" : "-1");
+      marker == null ? void 0 : marker.setAttribute("aria-current", entry.isIntersecting);
+      marker == null ? void 0 : marker.setAttribute("tabindex", entry.isIntersecting ? "0" : "-1");
     });
     const { isAtStart, isAtEnd, hasNoOverflow } = this.getInViewItems();
     this.navBtns.forEach((btn) => {
@@ -99,7 +106,7 @@ var SnapSlider = class extends HTMLElement {
       this.pager.style.visibility = hasNoOverflow ? "hidden" : null;
     }
     if (!this.initialLoad) {
-      this.dispatchEvent(
+      this.el.dispatchEvent(
         new CustomEvent("slideChange", {
           detail: this.getInViewItems()
         })
@@ -107,7 +114,7 @@ var SnapSlider = class extends HTMLElement {
     } else {
       this.initialLoad = false;
     }
-    if (document.activeElement?.parentElement?.hasAttribute("data-pager")) {
+    if (document.activeElement.parentElement.hasAttribute("data-pager")) {
       const activeItems = this.pager.querySelectorAll('[tabindex="0"]');
       if (activeItems.length) {
         activeItems[0].focus();
@@ -133,35 +140,43 @@ var SnapSlider = class extends HTMLElement {
     this.setupObservers();
   }
   setupSlides() {
+    this.slides = this.getSlides();
     this.slides.forEach((slide, index) => {
       const totalSlides = this.slides.length;
       const currentSlide = index + 1;
       const existingLabel = slide.getAttribute("aria-label") || "";
+      const isImage = slide.tagName.toLowerCase() === "img" || slide.tagName.toLowerCase() === "picture";
+      const slideLabelTag = isImage ? "alt" : "aria-label";
       const hasAutoLabel = existingLabel.startsWith(
         `${currentSlide} ${this.slideLabelSepparator} `
       );
-      slide.setAttribute("aria-roledescription", "item");
       if (!slide.hasAttribute("id")) {
         slide.setAttribute(
           "id",
           `${this.sliderId}-item-${currentSlide}`
         );
       }
-      if (!slide.hasAttribute("aria-label") || hasAutoLabel) {
+      if (!slide.hasAttribute(slideLabelTag) || slide.getAttribute(slideLabelTag) === "" || hasAutoLabel) {
         slide.setAttribute(
-          "aria-label",
+          slideLabelTag,
           `${currentSlide} ${this.slideLabelSepparator} ${totalSlides}`
         );
       }
-      if (!slide.hasAttribute("role")) {
+      if (slide.tagName.toLowerCase() === "div" && !slide.hasAttribute("role")) {
         slide.setAttribute("role", "group");
       }
+      if (this.pager && !isImage) {
+        slide.setAttribute("role", "tabpanel");
+      }
+      if (slide.getAttribute("role") === "group") {
+        slide.setAttribute("aria-roledescription", "item");
+      }
     });
-    if (!this.hasAttribute("role")) {
-      this.setAttribute("role", "region");
+    if (!this.el.hasAttribute("role") && this.el.tagName !== "SECTION") {
+      this.el.setAttribute("role", "region");
     }
-    if (!this.hasAttribute("aria-roledescription")) {
-      this.setAttribute("aria-roledescription", "carousel");
+    if (!this.el.hasAttribute("aria-roledescription")) {
+      this.el.setAttribute("aria-roledescription", "carousel");
     }
     this.track.setAttribute("tabindex", 0);
     this.track.setAttribute("aria-live", "polite");
@@ -186,27 +201,28 @@ var SnapSlider = class extends HTMLElement {
       marker.classList.add(...this.markerClasses.split(" "));
       this.setupPagerMarker(marker, index);
       newPager.appendChild(marker);
+      if (slide.tagName.toLowerCase() !== "img" && slide.tagName.toLowerCase() !== "picture") {
+        slide.removeAttribute("aria-roledescription");
+        slide.setAttribute("role", "tabpanel");
+      }
     });
     if (this.pager) {
-      this.track.setAttribute("role", "tabpanel");
-      this.track.removeAttribute("aria-roledescription");
       this.pager.setAttribute("role", "tablist");
       this.pager.replaceChildren(...newPager.children);
     } else {
       this.track.after(newPager);
-      this.pager = this.querySelector("[data-pager]");
+      this.pager = this.el.querySelector("[data-pager]");
     }
   }
   setupPager() {
     if (!this.pager) return;
-    this.track.setAttribute("role", "tabpanel");
-    this.track.removeAttribute("aria-roledescription");
     this.pager.setAttribute("role", "tablist");
     const items = Array.from(this.pager.querySelectorAll("a, button"));
     items.forEach((marker, index) => this.setupPagerMarker(marker, index));
   }
   setupPagerMarker(marker, index) {
-    const markerId = marker.getAttribute("href")?.slice(1) || marker.getAttribute(this.markerIdName);
+    var _a;
+    const markerId = ((_a = marker.getAttribute("href")) == null ? void 0 : _a.slice(1)) || marker.getAttribute(this.markerIdName);
     const slideId = markerId || `${this.sliderId}-item-${index + 1}`;
     if (!markerId) {
       marker.setAttribute(this.markerIdName, slideId);
@@ -226,7 +242,10 @@ var SnapSlider = class extends HTMLElement {
     }
     this.inViewObserver = new IntersectionObserver(
       this.handleInView.bind(this),
-      { root: this.track, threshold: 0.8 }
+      {
+        root: this.track,
+        threshold: 0.8
+      }
     );
     this.slides.forEach((slide) => this.inViewObserver.observe(slide));
   }
@@ -243,15 +262,15 @@ var SnapSlider = class extends HTMLElement {
     this.resizeObserver = new ResizeObserver(
       this.groupPagerMarkers.bind(this)
     );
-    this.resizeObserver.observe(this);
+    this.resizeObserver.observe(this.el);
   }
   goToSlideDir(dir = "next") {
     const { firstInViewSlide, lastInViewSlide } = this.getInViewItems();
     const isPrev = dir === "prev";
-    let targetSlide = isPrev ? firstInViewSlide?.previousElementSibling : lastInViewSlide?.nextElementSibling;
+    let targetSlide = isPrev ? firstInViewSlide == null ? void 0 : firstInViewSlide.previousElementSibling : lastInViewSlide == null ? void 0 : lastInViewSlide.nextElementSibling;
     if (!targetSlide) return;
     if (targetSlide.tagName.toLowerCase() === "template") {
-      targetSlide = isPrev ? targetSlide?.previousElementSibling : targetSlide?.nextElementSibling;
+      targetSlide = isPrev ? targetSlide == null ? void 0 : targetSlide.previousElementSibling : targetSlide == null ? void 0 : targetSlide.nextElementSibling;
     }
     targetSlide.scrollIntoView({
       block: "nearest",
@@ -260,26 +279,18 @@ var SnapSlider = class extends HTMLElement {
     });
   }
   pagerToSlide(event) {
+    var _a;
     if (!event.target.closest("[data-pager]")) return;
     const marker = event.target.closest("a, button");
     if (!marker) return;
     event.preventDefault();
-    const slideId = marker.getAttribute("href")?.slice(1) || marker.getAttribute(this.markerIdName);
+    const slideId = ((_a = marker.getAttribute("href")) == null ? void 0 : _a.slice(1)) || marker.getAttribute(this.markerIdName);
     const targetSlide = this.track.querySelector(`#${slideId}`);
-    targetSlide?.scrollIntoView({
+    targetSlide == null ? void 0 : targetSlide.scrollIntoView({
       block: "nearest",
       inline: "start",
       behavior: "smooth"
     });
-  }
-  setupEventListeners() {
-    this.eventHandler = this.eventHandler.bind(this);
-    this.addEventListener("click", this.eventHandler);
-    this.addEventListener("keydown", this.eventHandler);
-  }
-  removeEventListeners() {
-    this.removeEventListener("click", this.eventHandler);
-    this.removeEventListener("keydown", this.eventHandler);
   }
   eventHandler(event) {
     const target = event.target.closest(
@@ -304,10 +315,20 @@ var SnapSlider = class extends HTMLElement {
     }
   }
 };
-var snap_slider_default = SnapSlider;
 
-// src/module.js
-var module_default = customElements.define("snap-slider", snap_slider_default);
-export {
-  module_default as default
+// src/custom-element/module.js
+var SnapSliderElement = class extends HTMLElement {
+  constructor() {
+    super();
+    this.slider = null;
+  }
+  connectedCallback() {
+    this.slider = new SnapSlider(this);
+  }
+  disconnectedCallback() {
+    if (this.slider) {
+      this.slider.destroy();
+    }
+  }
 };
+customElements.define("snap-slider", SnapSliderElement);

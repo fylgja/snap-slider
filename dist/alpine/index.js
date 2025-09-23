@@ -1,28 +1,3 @@
-var __defProp = Object.defineProperty;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __getOwnPropNames = Object.getOwnPropertyNames;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __export = (target, all) => {
-  for (var name in all)
-    __defProp(target, name, { get: all[name], enumerable: true });
-};
-var __copyProps = (to, from, except, desc) => {
-  if (from && typeof from === "object" || typeof from === "function") {
-    for (let key of __getOwnPropNames(from))
-      if (!__hasOwnProp.call(to, key) && key !== except)
-        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
-  }
-  return to;
-};
-var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-
-// src/index.js
-var index_exports = {};
-__export(index_exports, {
-  default: () => index_default
-});
-module.exports = __toCommonJS(index_exports);
-
 // src/snap-slider.js
 var SnapSlider = class {
   constructor(el, { labelSepparator = "of", autoPager, groupPager } = {}) {
@@ -69,10 +44,9 @@ var SnapSlider = class {
     this.el.addEventListener("keydown", this.eventHandler.bind(this));
   }
   destroy() {
-    var _a, _b, _c;
-    (_a = this.inViewObserver) == null ? void 0 : _a.disconnect();
-    (_b = this.mutationObserver) == null ? void 0 : _b.disconnect();
-    (_c = this.resizeObserver) == null ? void 0 : _c.disconnect();
+    this.inViewObserver?.disconnect();
+    this.mutationObserver?.disconnect();
+    this.resizeObserver?.disconnect();
     this.el.removeEventListener("click", this.eventHandler.bind(this));
     this.el.removeEventListener("keydown", this.eventHandler.bind(this));
   }
@@ -113,8 +87,8 @@ var SnapSlider = class {
       ));
       entry.target.toggleAttribute("data-in-view", entry.isIntersecting);
       entry.target.toggleAttribute("inert", !entry.isIntersecting);
-      marker == null ? void 0 : marker.setAttribute("aria-current", entry.isIntersecting);
-      marker == null ? void 0 : marker.setAttribute("tabindex", entry.isIntersecting ? "0" : "-1");
+      marker?.setAttribute("aria-current", entry.isIntersecting);
+      marker?.setAttribute("tabindex", entry.isIntersecting ? "0" : "-1");
     });
     const { isAtStart, isAtEnd, hasNoOverflow } = this.getInViewItems();
     this.navBtns.forEach((btn) => {
@@ -246,8 +220,7 @@ var SnapSlider = class {
     items.forEach((marker, index) => this.setupPagerMarker(marker, index));
   }
   setupPagerMarker(marker, index) {
-    var _a;
-    const markerId = ((_a = marker.getAttribute("href")) == null ? void 0 : _a.slice(1)) || marker.getAttribute(this.markerIdName);
+    const markerId = marker.getAttribute("href")?.slice(1) || marker.getAttribute(this.markerIdName);
     const slideId = markerId || `${this.sliderId}-item-${index + 1}`;
     if (!markerId) {
       marker.setAttribute(this.markerIdName, slideId);
@@ -292,10 +265,10 @@ var SnapSlider = class {
   goToSlideDir(dir = "next") {
     const { firstInViewSlide, lastInViewSlide } = this.getInViewItems();
     const isPrev = dir === "prev";
-    let targetSlide = isPrev ? firstInViewSlide == null ? void 0 : firstInViewSlide.previousElementSibling : lastInViewSlide == null ? void 0 : lastInViewSlide.nextElementSibling;
+    let targetSlide = isPrev ? firstInViewSlide?.previousElementSibling : lastInViewSlide?.nextElementSibling;
     if (!targetSlide) return;
     if (targetSlide.tagName.toLowerCase() === "template") {
-      targetSlide = isPrev ? targetSlide == null ? void 0 : targetSlide.previousElementSibling : targetSlide == null ? void 0 : targetSlide.nextElementSibling;
+      targetSlide = isPrev ? targetSlide?.previousElementSibling : targetSlide?.nextElementSibling;
     }
     targetSlide.scrollIntoView({
       block: "nearest",
@@ -304,14 +277,13 @@ var SnapSlider = class {
     });
   }
   pagerToSlide(event) {
-    var _a;
     if (!event.target.closest("[data-pager]")) return;
     const marker = event.target.closest("a, button");
     if (!marker) return;
     event.preventDefault();
-    const slideId = ((_a = marker.getAttribute("href")) == null ? void 0 : _a.slice(1)) || marker.getAttribute(this.markerIdName);
+    const slideId = marker.getAttribute("href")?.slice(1) || marker.getAttribute(this.markerIdName);
     const targetSlide = this.track.querySelector(`#${slideId}`);
-    targetSlide == null ? void 0 : targetSlide.scrollIntoView({
+    targetSlide?.scrollIntoView({
       block: "nearest",
       inline: "start",
       behavior: "smooth"
@@ -341,5 +313,17 @@ var SnapSlider = class {
   }
 };
 
-// src/index.js
-var index_default = SnapSlider;
+// src/alpine/module.js
+function alpineSnapSlider(Alpine) {
+  Alpine.directive("snap-slider", (el, { modifiers }, { cleanup }) => {
+    const autoPager = modifiers.includes("auto-pager");
+    const groupPager = modifiers.includes("group-pager");
+    const slider = new SnapSlider(el, { autoPager, groupPager });
+    cleanup(() => {
+      slider.destroy();
+    });
+  });
+}
+export {
+  alpineSnapSlider as default
+};
