@@ -10,11 +10,11 @@ export class SnapSlider {
             return;
         }
         this.initialLoad = true;
-        this.pager = this.el.querySelector("[data-pager]");
         this.slides = [];
         this.inViewObserver;
         this.mutationObserver;
         this.resizeObserver;
+        this.pager = this.el.querySelector("[data-pager]");
         this.navBtns = Array.from(
             this.el.querySelectorAll("[data-next], [data-prev]")
         );
@@ -335,7 +335,6 @@ export class SnapSlider {
         targetSlide.scrollIntoView({
             block: "nearest",
             inline: isPrev ? "end" : "start",
-            behavior: "smooth",
         });
     }
 
@@ -348,11 +347,7 @@ export class SnapSlider {
             marker.getAttribute("href")?.slice(1) ||
             marker.getAttribute(this.markerIdName);
         const targetSlide = this.track.querySelector(`#${slideId}`);
-        targetSlide?.scrollIntoView({
-            block: "nearest",
-            inline: "start",
-            behavior: "smooth",
-        });
+        targetSlide?.scrollIntoView({ block: "nearest", inline: "start" });
     }
 
     eventHandler(event) {
