@@ -34,8 +34,8 @@ export class SnapSlider {
                 .replace(/^-+|-+$/g, "");
         this.sliderId = this.el.id || this.sliderLabel || "slider";
         this.markerIdName = "data-target-id";
-        this.pagerClasses = this.el.dataset.pagerClass || "pager";
-        this.markerClasses = this.el.dataset.markerClass || "pager-item";
+        this.pagerClasses = this.el.dataset.pagerClass || "snap-pager";
+        this.markerClasses = this.el.dataset.markerClass || "snap-marker";
 
         this.init();
     }
