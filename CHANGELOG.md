@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Renamed `pagerClasses` value from `pager` to `snap-pager`
+- Renamed `markerClasses` value from `pager-item` to `snap-marker`
 ## 2.0.0 - 2025-09-23
 
 ### Added
