@@ -140,7 +140,7 @@ export class SnapSlider {
         if (document.activeElement.parentElement.hasAttribute("data-pager")) {
             const activeItems = this.pager.querySelectorAll('[tabindex="0"]');
             if (activeItems.length) {
-                activeItems[0].focus();
+                activeItems[0].focus({ preventScroll: true });
             }
         }
     }
