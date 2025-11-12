@@ -150,6 +150,7 @@ export class SnapSlider {
         return Array.from(this.track.children).filter(
             (child) =>
                 child.tagName.toLowerCase() !== "template" &&
+                child.tagName.toLowerCase() !== "style" &&
                 child.tagName.toLowerCase() !== "script"
         );
     }
