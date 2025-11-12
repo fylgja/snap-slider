@@ -7,14 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 2.1.0 - 2025-10-12
+
 ### Changed
 
-- Renamed `pagerClasses` value from `pager` to `snap-pager`
-- Renamed `markerClasses` value from `pager-item` to `snap-marker`
+- Changed the default class for the pager container from `pager` to `snap-pager`.
+- Changed the default class for pager markers from `pager-item` to `snap-marker`.
 
 ### Fixed
 
-- getSlides also counting the style tag
+- The slider no longer incorrectly counts `<style>` tags as slides.
+- Prevented programmatic scrolling from changing focus when pager markers are off-screen.
 
 ## 2.0.0 - 2025-09-23
 

@@ -11,11 +11,11 @@ var SnapSlider = class {
       return;
     }
     this.initialLoad = true;
-    this.pager = this.el.querySelector("[data-pager]");
     this.slides = [];
     this.inViewObserver;
     this.mutationObserver;
     this.resizeObserver;
+    this.pager = this.el.querySelector("[data-pager]");
     this.navBtns = Array.from(
       this.el.querySelectorAll("[data-next], [data-prev]")
     );
@@ -25,8 +25,8 @@ var SnapSlider = class {
     this.sliderLabel = this.el.hasAttribute("aria-label") && this.el.getAttribute("aria-label").toLowerCase().trim().replace(/[^a-z0-9_-]+/g, "-").replace(/^-+|-+$/g, "");
     this.sliderId = this.el.id || this.sliderLabel || "slider";
     this.markerIdName = "data-target-id";
-    this.pagerClasses = this.el.dataset.pagerClass || "pager";
-    this.markerClasses = this.el.dataset.markerClass || "pager-item";
+    this.pagerClasses = this.el.dataset.pagerClass || "snap-pager";
+    this.markerClasses = this.el.dataset.markerClass || "snap-marker";
     this.init();
   }
   init() {
@@ -117,14 +117,14 @@ var SnapSlider = class {
     if (document.activeElement.parentElement.hasAttribute("data-pager")) {
       const activeItems = this.pager.querySelectorAll('[tabindex="0"]');
       if (activeItems.length) {
-        activeItems[0].focus();
+        activeItems[0].focus({ preventScroll: true });
       }
     }
   }
   getSlides() {
     if (!this.track) return [];
     return Array.from(this.track.children).filter(
-      (child) => child.tagName.toLowerCase() !== "template" && child.tagName.toLowerCase() !== "script"
+      (child) => child.tagName.toLowerCase() !== "template" && child.tagName.toLowerCase() !== "style" && child.tagName.toLowerCase() !== "script"
     );
   }
   refreshSlides() {
@@ -274,8 +274,7 @@ var SnapSlider = class {
     }
     targetSlide.scrollIntoView({
       block: "nearest",
-      inline: isPrev ? "end" : "start",
-      behavior: "smooth"
+      inline: isPrev ? "end" : "start"
     });
   }
   pagerToSlide(event) {
@@ -286,11 +285,7 @@ var SnapSlider = class {
     event.preventDefault();
     const slideId = ((_a = marker.getAttribute("href")) == null ? void 0 : _a.slice(1)) || marker.getAttribute(this.markerIdName);
     const targetSlide = this.track.querySelector(`#${slideId}`);
-    targetSlide == null ? void 0 : targetSlide.scrollIntoView({
-      block: "nearest",
-      inline: "start",
-      behavior: "smooth"
-    });
+    targetSlide == null ? void 0 : targetSlide.scrollIntoView({ block: "nearest", inline: "start" });
   }
   eventHandler(event) {
     const target = event.target.closest(

@@ -89,17 +89,17 @@ Then, apply the `x-snap-slider` directive to your slider element.
 
 The `snap-slider` supports the following data attributes for configuration:
 
-| Data Attribute | Description | Default |
-| --- | --- | --- |
-| `data-track` | **Required.** Identifies the container for the slider's slides. | |
-| `data-next` | Designates a button to navigate to the next slide. | |
-| `data-prev` | Designates a button to navigate to the previous slide. | |
-| `data-pager` | Designates the container for pagination markers. | |
-| `data-auto-pager` | Automatically generates pagination markers. | `false` |
-| `data-group-pager` | Groups pager markers based on the number of visible slides. | `false` |
-| `data-slide-label-sepparator` | Customizes the separator in the `aria-label` for slides (e.g., "1 of 12"). | `of` |
-| `data-pager-class` | Sets custom classes for the pager container. | `pager` |
-| `data-marker-class` | Sets custom classes for the pager markers. | `pager-item` |
+| Data Attribute                | Description                                                                | Default       |
+| ----------------------------- | -------------------------------------------------------------------------- | ------------- |
+| `data-track`                  | **Required.** Identifies the container for the slider's slides.            |               |
+| `data-next`                   | Designates a button to navigate to the next slide.                         |               |
+| `data-prev`                   | Designates a button to navigate to the previous slide.                     |               |
+| `data-pager`                  | Designates the container for pagination markers.                           |               |
+| `data-auto-pager`             | Automatically generates pagination markers.                                | `false`       |
+| `data-group-pager`            | Groups pager markers based on the number of visible slides.                | `false`       |
+| `data-slide-label-sepparator` | Customizes the separator in the `aria-label` for slides (e.g., "1 of 12"). | `of`          |
+| `data-pager-class`            | Sets custom classes for the pager container.                               | `snap-pager`  |
+| `data-marker-class`           | Sets custom classes for the pager markers.                                 | `snap-marker` |
 
 ### AlpineJS Configuration
 
@@ -152,10 +152,10 @@ const sliderEl = document.querySelector('[x-snap-slider]');
 const snapSliderInstance = sliderEl.snapSlider;
 ```
 
-| Method | Description |
-| --- | --- |
-| `init()` | Initializes the slider. This is called automatically. |
-| `destroy()` | Removes all event listeners and observers. |
+| Method            | Description                                                                     |
+| ----------------- | ------------------------------------------------------------------------------- |
+| `init()`          | Initializes the slider. This is called automatically.                           |
+| `destroy()`       | Removes all event listeners and observers.                                      |
 | `refreshSlides()` | Re-initializes the slider, useful when slides are added or removed dynamically. |
 
 ### Events
@@ -171,12 +171,12 @@ sliderEl.addEventListener('slideChange', (event) => {
 
 The `event.detail` object contains the following properties:
 
-| Property | Description |
-| --- | --- |
-| `inViewSlides` | An array of the slides currently in view. |
-| `totalInViewSlides` | The total number of slides in view. |
-| `firstInViewSlide` | The first slide in view. |
-| `lastInViewSlide` | The last slide in view. |
-| `isAtStart` | A boolean indicating if the slider is at the beginning. |
-| `isAtEnd` | A boolean indicating if the slider is at the end. |
-| `hasNoOverflow` | A boolean indicating if all slides are visible at once. |
+| Property            | Description                                             |
+| ------------------- | ------------------------------------------------------- |
+| `inViewSlides`      | An array of the slides currently in view.               |
+| `totalInViewSlides` | The total number of slides in view.                     |
+| `firstInViewSlide`  | The first slide in view.                                |
+| `lastInViewSlide`   | The last slide in view.                                 |
+| `isAtStart`         | A boolean indicating if the slider is at the beginning. |
+| `isAtEnd`           | A boolean indicating if the slider is at the end.       |
+| `hasNoOverflow`     | A boolean indicating if all slides are visible at once. |
