@@ -86,7 +86,7 @@ export class SnapSlider {
     }
 
     groupPagerMarkers() {
-        if (!this.pager || !this.useGroupPager) return;
+        if (this.slides.length === 0 || !this.pager || !this.useGroupPager) return;
         const totalVisibleSlides = this.roundUpIfGreaterThan(
             this.track.offsetWidth / this.slides[0].offsetWidth
         );
