@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 2.2.0 - 2026-04-11
+
 ### Added
 
 - Added a `loop` option (and `data-loop` attribute). When enabled, navigation buttons never disable and the slider wraps from the last slide back to the first and vice versa. Available as a modifier in the AlpineJS integration (`x-snap-slider.loop`).

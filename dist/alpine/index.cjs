@@ -25,7 +25,7 @@ module.exports = __toCommonJS(module_exports);
 
 // src/snap-slider.js
 var SnapSlider = class {
-  constructor(el, { labelSepparator = "of", autoPager, groupPager } = {}) {
+  constructor(el, { labelSepparator = "of", autoPager, groupPager, loop } = {}) {
     this.el = el;
     this.track = this.el.querySelector("[data-track]");
     if (!this.track) {
@@ -47,6 +47,7 @@ var SnapSlider = class {
     this.slideLabelSepparator = this.el.dataset.slideLabelSepparator || labelSepparator;
     this.useAutoPager = autoPager || this.el.hasAttribute("data-auto-pager") || false;
     this.useGroupPager = groupPager || this.el.hasAttribute("data-group-pager") || false;
+    this.useLoop = loop || this.el.hasAttribute("data-loop") || false;
     this.sliderLabel = this.el.hasAttribute("aria-label") && this.el.getAttribute("aria-label").toLowerCase().trim().replace(/[^a-z0-9_-]+/g, "-").replace(/^-+|-+$/g, "");
     this.sliderId = this.el.id || this.sliderLabel || "slider";
     this.markerIdName = "data-target-id";
@@ -97,7 +98,8 @@ var SnapSlider = class {
     };
   }
   groupPagerMarkers() {
-    if (!this.pager || !this.useGroupPager) return;
+    if (this.slides.length === 0 || !this.pager || !this.useGroupPager)
+      return;
     const totalVisibleSlides = this.roundUpIfGreaterThan(
       this.track.offsetWidth / this.slides[0].offsetWidth
     );
@@ -120,11 +122,11 @@ var SnapSlider = class {
     this.navBtns.forEach((btn) => {
       if (btn.hasAttribute("data-next")) {
         btn.style.visibility = hasNoOverflow ? "hidden" : null;
-        isAtEnd ? btn.setAttribute("disabled", "") : btn.removeAttribute("disabled");
+        isAtEnd && !this.useLoop ? btn.setAttribute("disabled", "") : btn.removeAttribute("disabled");
       }
       if (btn.hasAttribute("data-prev")) {
         btn.style.visibility = hasNoOverflow ? "hidden" : null;
-        isAtStart ? btn.setAttribute("disabled", "") : btn.removeAttribute("disabled");
+        isAtStart && !this.useLoop ? btn.setAttribute("disabled", "") : btn.removeAttribute("disabled");
       }
     });
     if (this.pager) {
@@ -293,6 +295,9 @@ var SnapSlider = class {
     const { firstInViewSlide, lastInViewSlide } = this.getInViewItems();
     const isPrev = dir === "prev";
     let targetSlide = isPrev ? firstInViewSlide == null ? void 0 : firstInViewSlide.previousElementSibling : lastInViewSlide == null ? void 0 : lastInViewSlide.nextElementSibling;
+    if (!targetSlide && this.useLoop) {
+      targetSlide = isPrev ? this.slides[this.slides.length - 1] : this.slides[0];
+    }
     if (!targetSlide) return;
     if (targetSlide.tagName.toLowerCase() === "template") {
       targetSlide = isPrev ? targetSlide == null ? void 0 : targetSlide.previousElementSibling : targetSlide == null ? void 0 : targetSlide.nextElementSibling;
@@ -339,9 +344,11 @@ var SnapSlider = class {
 // src/alpine/module.js
 function alpineSnapSlider(Alpine) {
   Alpine.directive("snap-slider", (el, { modifiers }, { cleanup }) => {
-    const autoPager = modifiers.includes("auto-pager");
-    const groupPager = modifiers.includes("group-pager");
-    const slider = new SnapSlider(el, { autoPager, groupPager });
+    const slider = new SnapSlider(el, {
+      autoPager: modifiers.includes("auto-pager"),
+      groupPager: modifiers.includes("group-pager"),
+      loop: modifiers.includes("loop")
+    });
     cleanup(() => {
       slider.destroy();
     });
