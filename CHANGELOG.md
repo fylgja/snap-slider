@@ -7,13 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## 2.2.0 - 2026-04-11
+## [2.2.0] - 2026-04-11
 
 ### Added
 
 - Added a `loop` option (and `data-loop` attribute). When enabled, navigation buttons never disable and the slider wraps from the last slide back to the first and vice versa. Available as a modifier in the AlpineJS integration (`x-snap-slider.loop`).
 
-## 2.1.0 - 2025-10-12
+### Fixed
+
+- Fixed an edge case where an empty slider with `group-pager` enabled would throw an error.
+
+## [2.1.0] - 2025-10-12
 
 ### Changed
 
@@ -25,7 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The slider no longer incorrectly counts `<style>` tags as slides.
 - Prevented programmatic scrolling from changing focus when pager markers are off-screen.
 
-## 2.0.0 - 2025-09-23
+## [2.0.0] - 2025-09-23
 
 ### Added
 
@@ -41,4 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial Release 🎉
 
-[Unreleased]: https://github.com/olivierlacan/keep-a-changelog/compare/1.0.0...HEAD
+[Unreleased]: https://github.com/fylgja/snap-slider/compare/2.2.0...HEAD
+[2.2.0]: https://github.com/fylgja/snap-slider/compare/2.1.0...2.2.0
+[2.1.0]: https://github.com/fylgja/snap-slider/compare/2.0.0...2.1.0
+[2.0.0]: https://github.com/fylgja/snap-slider/compare/1.0.0...2.0.0
