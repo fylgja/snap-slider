@@ -1,4 +1,4 @@
-name: Publish Fylgja Snap Slider
+name: Publish
 
 on:
   release:
