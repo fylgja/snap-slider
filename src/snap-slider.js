@@ -1,11 +1,14 @@
 export class SnapSlider {
-    constructor(el, { labelSepparator = "of", autoPager, groupPager } = {}) {
+    constructor(
+        el,
+        { labelSepparator = "of", autoPager, groupPager, loop } = {},
+    ) {
         this.el = el;
         this.track = this.el.querySelector("[data-track]");
         if (!this.track) {
             console.warn(
                 "No Slider track defined, reverting back to CSS slider.\nPlease create a wrapper for your slides with the attribute data-track",
-                this.el
+                this.el,
             );
             return;
         }
@@ -16,7 +19,7 @@ export class SnapSlider {
         this.resizeObserver;
         this.pager = this.el.querySelector("[data-pager]");
         this.navBtns = Array.from(
-            this.el.querySelectorAll("[data-next], [data-prev]")
+            this.el.querySelectorAll("[data-next], [data-prev]"),
         );
         this.slideLabelSepparator =
             this.el.dataset.slideLabelSepparator || labelSepparator;
@@ -24,6 +27,7 @@ export class SnapSlider {
             autoPager || this.el.hasAttribute("data-auto-pager") || false;
         this.useGroupPager =
             groupPager || this.el.hasAttribute("data-group-pager") || false;
+        this.useLoop = loop || this.el.hasAttribute("data-loop") || false;
         this.sliderLabel =
             this.el.hasAttribute("aria-label") &&
             this.el
@@ -86,9 +90,10 @@ export class SnapSlider {
     }
 
     groupPagerMarkers() {
-        if (this.slides.length === 0 || !this.pager || !this.useGroupPager) return;
+        if (this.slides.length === 0 || !this.pager || !this.useGroupPager)
+            return;
         const totalVisibleSlides = this.roundUpIfGreaterThan(
-            this.track.offsetWidth / this.slides[0].offsetWidth
+            this.track.offsetWidth / this.slides[0].offsetWidth,
         );
         const markers = Array.from(this.pager.querySelectorAll("a, button"));
         markers.forEach((marker, index) => {
@@ -103,7 +108,7 @@ export class SnapSlider {
                 this.pager &&
                 (this.pager.querySelector(`[href="#${entry.target.id}"]`) ||
                     this.pager.querySelector(
-                        `[${this.markerIdName}="${entry.target.id}"]`
+                        `[${this.markerIdName}="${entry.target.id}"]`,
                     ));
             entry.target.toggleAttribute("data-in-view", entry.isIntersecting);
             entry.target.toggleAttribute("inert", !entry.isIntersecting);
@@ -114,13 +119,13 @@ export class SnapSlider {
         this.navBtns.forEach((btn) => {
             if (btn.hasAttribute("data-next")) {
                 btn.style.visibility = hasNoOverflow ? "hidden" : null;
-                isAtEnd
+                isAtEnd && !this.useLoop
                     ? btn.setAttribute("disabled", "")
                     : btn.removeAttribute("disabled");
             }
             if (btn.hasAttribute("data-prev")) {
                 btn.style.visibility = hasNoOverflow ? "hidden" : null;
-                isAtStart
+                isAtStart && !this.useLoop
                     ? btn.setAttribute("disabled", "")
                     : btn.removeAttribute("disabled");
             }
@@ -132,7 +137,7 @@ export class SnapSlider {
             this.el.dispatchEvent(
                 new CustomEvent("slideChange", {
                     detail: this.getInViewItems(),
-                })
+                }),
             );
         } else {
             this.initialLoad = false;
@@ -151,7 +156,7 @@ export class SnapSlider {
             (child) =>
                 child.tagName.toLowerCase() !== "template" &&
                 child.tagName.toLowerCase() !== "style" &&
-                child.tagName.toLowerCase() !== "script"
+                child.tagName.toLowerCase() !== "script",
         );
     }
 
@@ -179,12 +184,12 @@ export class SnapSlider {
                 slide.tagName.toLowerCase() === "picture";
             const slideLabelTag = isImage ? "alt" : "aria-label";
             const hasAutoLabel = existingLabel.startsWith(
-                `${currentSlide} ${this.slideLabelSepparator} `
+                `${currentSlide} ${this.slideLabelSepparator} `,
             );
             if (!slide.hasAttribute("id")) {
                 slide.setAttribute(
                     "id",
-                    `${this.sliderId}-item-${currentSlide}`
+                    `${this.sliderId}-item-${currentSlide}`,
                 );
             }
 
@@ -195,7 +200,7 @@ export class SnapSlider {
             ) {
                 slide.setAttribute(
                     slideLabelTag,
-                    `${currentSlide} ${this.slideLabelSepparator} ${totalSlides}`
+                    `${currentSlide} ${this.slideLabelSepparator} ${totalSlides}`,
                 );
             }
 
@@ -299,14 +304,14 @@ export class SnapSlider {
             {
                 root: this.track,
                 threshold: 0.8,
-            }
+            },
         );
         this.slides.forEach((slide) => this.inViewObserver.observe(slide));
     }
 
     setupMutationObserver() {
         this.mutationObserver = new MutationObserver(
-            this.refreshSlides.bind(this)
+            this.refreshSlides.bind(this),
         );
         this.mutationObserver.observe(this.track, {
             childList: true,
@@ -316,7 +321,7 @@ export class SnapSlider {
 
     setupResizeObserver() {
         this.resizeObserver = new ResizeObserver(
-            this.groupPagerMarkers.bind(this)
+            this.groupPagerMarkers.bind(this),
         );
         this.resizeObserver.observe(this.el);
     }
@@ -327,6 +332,11 @@ export class SnapSlider {
         let targetSlide = isPrev
             ? firstInViewSlide?.previousElementSibling
             : lastInViewSlide?.nextElementSibling;
+        if (!targetSlide && this.useLoop) {
+            targetSlide = isPrev
+                ? this.slides[this.slides.length - 1]
+                : this.slides[0];
+        }
         if (!targetSlide) return;
         if (targetSlide.tagName.toLowerCase() === "template") {
             targetSlide = isPrev
@@ -353,7 +363,7 @@ export class SnapSlider {
 
     eventHandler(event) {
         const target = event.target.closest(
-            "[data-next], [data-prev], [data-pager]"
+            "[data-next], [data-prev], [data-pager]",
         );
         if (!target) return;
         if (event.type === "click") {
