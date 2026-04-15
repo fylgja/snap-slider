@@ -268,14 +268,15 @@
     goToSlideDir(dir = "next") {
       const { firstInViewSlide, lastInViewSlide } = this.getInViewItems();
       const isPrev = dir === "prev";
-      let targetSlide = isPrev ? firstInViewSlide?.previousElementSibling : lastInViewSlide?.nextElementSibling;
-      if (!targetSlide && this.useLoop) {
-        targetSlide = isPrev ? this.slides[this.slides.length - 1] : this.slides[0];
+      const referenceSlide = isPrev ? firstInViewSlide : lastInViewSlide;
+      const currentIndex = this.slides.indexOf(referenceSlide);
+      let targetIndex = isPrev ? currentIndex - 1 : currentIndex + 1;
+      if (targetIndex < 0 || targetIndex >= this.slides.length) {
+        if (!this.useLoop) return;
+        targetIndex = isPrev ? this.slides.length - 1 : 0;
       }
+      const targetSlide = this.slides[targetIndex];
       if (!targetSlide) return;
-      if (targetSlide.tagName.toLowerCase() === "template") {
-        targetSlide = isPrev ? targetSlide?.previousElementSibling : targetSlide?.nextElementSibling;
-      }
       targetSlide.scrollIntoView({
         block: "nearest",
         inline: isPrev ? "end" : "start"

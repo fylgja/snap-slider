@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.1] - 2026-04-15
+
+### Fixed
+
+- Fixed loop navigation getting stuck when the track contains invalid elements (such as `<template>` or `<script>` tags). Navigation now uses the filtered slides list instead of raw DOM siblings.
+
 ## [2.2.0] - 2026-04-11
 
 ### Added
@@ -45,7 +51,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial Release 🎉
 
-[Unreleased]: https://github.com/fylgja/snap-slider/compare/2.2.0...HEAD
+[Unreleased]: https://github.com/fylgja/snap-slider/compare/2.2.1...HEAD
+[2.2.1]: https://github.com/fylgja/snap-slider/compare/2.2.0...2.2.1
 [2.2.0]: https://github.com/fylgja/snap-slider/compare/2.1.0...2.2.0
 [2.1.0]: https://github.com/fylgja/snap-slider/compare/2.0.0...2.1.0
 [2.0.0]: https://github.com/fylgja/snap-slider/compare/1.0.0...2.0.0
