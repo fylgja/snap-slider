@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.2] - 2026-04-30
+
+### Added
+
+- Added ArrowUp and ArrowDown key support for pager navigation, consistent with ArrowLeft and ArrowRight. Arrow key events on the pager now call `preventDefault()` to prevent the page from scrolling.
+- Added `inert` attribute to the pager when the slider has no overflow, ensuring hidden pager controls are fully removed from keyboard and assistive technology focus.
+- Added support for dynamically showing or hiding slides via `display: none`. Hidden slides are excluded from the slide list, and the MutationObserver now watches for style attribute changes on child elements to refresh accordingly.
+
+### Fixed
+
+- Fixed rapid navigation triggering multiple scroll jumps by introducing a navigation lock that resets on `scrollend` (with a `scroll`-based fallback for unsupported browsers).
+- Fixed `getInViewItems()` incorrectly including in-view markers from nested sliders by scoping the query to the current instance's slides only.
+- Fixed the track `tabindex` being overwritten on re-init if a custom value was already set.
+
 ## [2.2.1] - 2026-04-16
 
 ### Fixed

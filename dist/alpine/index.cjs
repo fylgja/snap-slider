@@ -68,6 +68,18 @@ var SnapSlider = class {
     this.setupResizeObserver();
     this.el.addEventListener("click", this.eventHandler.bind(this));
     this.el.addEventListener("keydown", this.eventHandler.bind(this));
+    if ("onscrollend" in window) {
+      this.track.addEventListener("scrollend", () => {
+        this.isNavigating = false;
+      });
+    } else {
+      this.track.addEventListener("scroll", () => {
+        clearTimeout(this.scrollEndTimer);
+        this.scrollEndTimer = setTimeout(() => {
+          this.isNavigating = false;
+        }, 100);
+      });
+    }
   }
   destroy() {
     var _a, _b, _c;
@@ -82,7 +94,7 @@ var SnapSlider = class {
     return decimalPart >= min ? Math.ceil(number) : Math.floor(number);
   }
   getInViewItems() {
-    const inViewSlides = this.track.querySelectorAll("[data-in-view]");
+    const inViewSlides = Array.from(this.track.querySelectorAll("[data-in-view]")).filter((el) => this.slides.includes(el));
     const firstInViewSlide = inViewSlides[0] || null;
     const lastInViewSlide = inViewSlides[inViewSlides.length - 1] || null;
     const isAtStart = firstInViewSlide === this.slides[0];
@@ -131,6 +143,7 @@ var SnapSlider = class {
     });
     if (this.pager) {
       this.pager.style.visibility = hasNoOverflow ? "hidden" : null;
+      this.pager.toggleAttribute("inert", hasNoOverflow);
     }
     if (!this.initialLoad) {
       this.el.dispatchEvent(
@@ -151,7 +164,7 @@ var SnapSlider = class {
   getSlides() {
     if (!this.track) return [];
     return Array.from(this.track.children).filter(
-      (child) => child.tagName.toLowerCase() !== "template" && child.tagName.toLowerCase() !== "style" && child.tagName.toLowerCase() !== "script"
+      (child) => child.tagName.toLowerCase() !== "template" && child.tagName.toLowerCase() !== "style" && child.tagName.toLowerCase() !== "script" && child.style.display !== "none"
     );
   }
   refreshSlides() {
@@ -205,7 +218,9 @@ var SnapSlider = class {
     if (!this.el.hasAttribute("aria-roledescription")) {
       this.el.setAttribute("aria-roledescription", "carousel");
     }
-    this.track.setAttribute("tabindex", 0);
+    if (!this.track.hasAttribute("tabindex")) {
+      this.track.setAttribute("tabindex", 0);
+    }
     this.track.setAttribute("aria-live", "polite");
   }
   setupNav() {
@@ -277,12 +292,15 @@ var SnapSlider = class {
     this.slides.forEach((slide) => this.inViewObserver.observe(slide));
   }
   setupMutationObserver() {
-    this.mutationObserver = new MutationObserver(
-      this.refreshSlides.bind(this)
-    );
+    this.mutationObserver = new MutationObserver((mutations) => {
+      if (mutations.some((m) => m.type === "childList" || m.target.parentElement === this.track)) {
+        this.refreshSlides();
+      }
+    });
     this.mutationObserver.observe(this.track, {
       childList: true,
-      subtree: false
+      subtree: true,
+      attributeFilter: ["style"]
     });
   }
   setupResizeObserver() {
@@ -292,6 +310,7 @@ var SnapSlider = class {
     this.resizeObserver.observe(this.el);
   }
   goToSlideDir(dir = "next") {
+    if (this.isNavigating) return;
     const { firstInViewSlide, lastInViewSlide } = this.getInViewItems();
     const isPrev = dir === "prev";
     const referenceSlide = isPrev ? firstInViewSlide : lastInViewSlide;
@@ -303,6 +322,7 @@ var SnapSlider = class {
     }
     const targetSlide = this.slides[targetIndex];
     if (!targetSlide) return;
+    this.isNavigating = true;
     targetSlide.scrollIntoView({
       block: "nearest",
       inline: isPrev ? "end" : "start"
@@ -333,9 +353,11 @@ var SnapSlider = class {
       }
     }
     if (event.type === "keydown" && target.closest("[data-pager]")) {
-      if (event.key === "ArrowRight") {
+      if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+        event.preventDefault();
         this.goToSlideDir("next");
-      } else if (event.key === "ArrowLeft") {
+      } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+        event.preventDefault();
         this.goToSlideDir("prev");
       }
     }
