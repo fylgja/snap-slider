@@ -6,6 +6,7 @@ function alpineSnapSlider(Alpine) {
             autoPager: modifiers.includes("auto-pager"),
             groupPager: modifiers.includes("group-pager"),
             loop: modifiers.includes("loop"),
+            forcePager: modifiers.includes("force-pager"),
         });
 
         cleanup(() => {

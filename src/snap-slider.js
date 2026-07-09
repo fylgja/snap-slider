@@ -1,7 +1,7 @@
 export class SnapSlider {
     constructor(
         el,
-        { labelSepparator = "of", autoPager, groupPager, loop } = {},
+        { labelSepparator = "of", autoPager, groupPager, loop, forcePager } = {},
     ) {
         this.el = el;
         this.track = this.el.querySelector("[data-track]");
@@ -28,6 +28,8 @@ export class SnapSlider {
         this.useGroupPager =
             groupPager || this.el.hasAttribute("data-group-pager") || false;
         this.useLoop = loop || this.el.hasAttribute("data-loop") || false;
+        this.forcePager =
+            forcePager || this.el.hasAttribute("data-force-pager") || false;
         this.sliderLabel =
             this.el.hasAttribute("aria-label") &&
             this.el
@@ -140,8 +142,9 @@ export class SnapSlider {
             }
         });
         if (this.pager) {
-            this.pager.style.visibility = hasNoOverflow ? "hidden" : null;
-            this.pager.toggleAttribute("inert", hasNoOverflow);
+            const hidePager = hasNoOverflow && !this.forcePager;
+            this.pager.style.visibility = hidePager ? "hidden" : null;
+            this.pager.toggleAttribute("inert", hidePager);
         }
         if (!this.initialLoad) {
             this.el.dispatchEvent(
