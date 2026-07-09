@@ -98,16 +98,17 @@ The `snap-slider` supports the following data attributes for configuration:
 | `data-auto-pager`             | Automatically generates pagination markers.                                | `false`       |
 | `data-group-pager`            | Groups pager markers based on the number of visible slides.                | `false`       |
 | `data-loop`                   | Enables looping. Navigation wraps around and buttons are never disabled.   | `false`       |
+| `data-force-pager`            | Keeps the pager visible even when the slider has no overflow.              | `false`       |
 | `data-slide-label-sepparator` | Customizes the separator in the `aria-label` for slides (e.g., "1 of 12"). | `of`          |
 | `data-pager-class`            | Sets custom classes for the pager container.                               | `snap-pager`  |
 | `data-marker-class`           | Sets custom classes for the pager markers.                                 | `snap-marker` |
 
 ### AlpineJS Configuration
 
-For the AlpineJS version, boolean options like `auto-pager`, `group-pager`, and `loop` are passed as modifiers to the `x-snap-slider` directive:
+For the AlpineJS version, boolean options like `auto-pager`, `group-pager`, `loop`, and `force-pager` are passed as modifiers to the `x-snap-slider` directive:
 
 ```html
-<div x-data x-snap-slider.auto-pager.group-pager.loop>
+<div x-data x-snap-slider.auto-pager.group-pager.loop.force-pager>
     ...
 </div>
 ```

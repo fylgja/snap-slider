@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.3] - 2026-07-09
+
+### Added
+
+- Added a `forcePager` option (and `data-force-pager` attribute). When enabled, the pager stays visible even when the slider has no overflow. Available as a modifier in the AlpineJS integration (`x-snap-slider.force-pager`).
+
 ## [2.2.2] - 2026-04-30
 
 ### Added

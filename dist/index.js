@@ -1,6 +1,6 @@
 // src/snap-slider.js
 var SnapSlider = class {
-  constructor(el, { labelSepparator = "of", autoPager, groupPager, loop } = {}) {
+  constructor(el, { labelSepparator = "of", autoPager, groupPager, loop, forcePager } = {}) {
     this.el = el;
     this.track = this.el.querySelector("[data-track]");
     if (!this.track) {
@@ -23,6 +23,7 @@ var SnapSlider = class {
     this.useAutoPager = autoPager || this.el.hasAttribute("data-auto-pager") || false;
     this.useGroupPager = groupPager || this.el.hasAttribute("data-group-pager") || false;
     this.useLoop = loop || this.el.hasAttribute("data-loop") || false;
+    this.forcePager = forcePager || this.el.hasAttribute("data-force-pager") || false;
     this.sliderLabel = this.el.hasAttribute("aria-label") && this.el.getAttribute("aria-label").toLowerCase().trim().replace(/[^a-z0-9_-]+/g, "-").replace(/^-+|-+$/g, "");
     this.sliderId = this.el.id || this.sliderLabel || "slider";
     this.markerIdName = "data-target-id";
@@ -116,8 +117,9 @@ var SnapSlider = class {
       }
     });
     if (this.pager) {
-      this.pager.style.visibility = hasNoOverflow ? "hidden" : null;
-      this.pager.toggleAttribute("inert", hasNoOverflow);
+      const hidePager = hasNoOverflow && !this.forcePager;
+      this.pager.style.visibility = hidePager ? "hidden" : null;
+      this.pager.toggleAttribute("inert", hidePager);
     }
     if (!this.initialLoad) {
       this.el.dispatchEvent(
