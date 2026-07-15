@@ -139,7 +139,10 @@ You can interact with the slider programmatically using the following methods an
 
 ### Methods
 
-First, get the `SnapSlider` instance:
+Instance access is only available for the Custom Element. The AlpineJS integration manages
+the slider's lifecycle internally through Alpine's own directive lifecycle, so the
+`SnapSlider` instance isn't exposed on the element, keeping the two integrations consistent
+in how state is managed.
 
 **For the Custom Element:**
 ```js
@@ -147,18 +150,11 @@ const snapSliderElement = document.querySelector('snap-slider');
 const snapSliderInstance = snapSliderElement.slider;
 ```
 
-**For the AlpineJS component:**
-
-```js
-const sliderEl = document.querySelector('[x-snap-slider]');
-const snapSliderInstance = sliderEl.snapSlider;
-```
-
 | Method            | Description                                                                     |
 | ----------------- | ------------------------------------------------------------------------------- |
 | `init()`          | Initializes the slider. This is called automatically.                           |
 | `destroy()`       | Removes all event listeners and observers.                                      |
-| `refreshSlides()` | Re-initializes the slider, useful when slides are added or removed dynamically. |
+| `refreshSlides()` | Re-initializes the slider, useful when slides are added or removed dynamically. Note that a built-in `MutationObserver` already calls this automatically when slides are added or removed, so manual calls are rarely needed. |
 
 ### Events
 
