@@ -7,8 +7,8 @@
   "license": "MIT",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
-  "unpkg": "dist/custom-element/index.min.js",
-  "jsdelivr": "dist/custom-element/index.min.js",
+  "unpkg": "dist/custom-element/cdn.min.js",
+  "jsdelivr": "dist/custom-element/cdn.min.js",
   "exports": {
     ".": {
       "import": "./dist/index.js",
