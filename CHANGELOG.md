@@ -7,19 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.4] - 2026-08-11
+
+### Fixed
+
+- Fixed the MutationObserver refreshing the slider on any DOM change inside a slide.
+  A refresh is now limited to child changes on the track itself,
+  and to style changes on its direct children.
+  Nested components that insert or remove elements no longer rebuild the pager.
+
 ## [2.2.3] - 2026-07-09
 
 ### Added
 
-- Added a `forcePager` option (and `data-force-pager` attribute). When enabled, the pager stays visible even when the slider has no overflow. Available as a modifier in the AlpineJS integration (`x-snap-slider.force-pager`).
+- Added a `forcePager` option (and `data-force-pager` attribute).
+  When enabled, the pager stays visible even when the slider has no overflow.
+  Available as a modifier in the AlpineJS integration (`x-snap-slider.force-pager`).
 
 ## [2.2.2] - 2026-04-30
 
 ### Added
 
-- Added ArrowUp and ArrowDown key support for pager navigation, consistent with ArrowLeft and ArrowRight. Arrow key events on the pager now call `preventDefault()` to prevent the page from scrolling.
+- Added ArrowUp and ArrowDown key support for pager navigation, consistent with ArrowLeft and ArrowRight.
+  Arrow key events on the pager now call `preventDefault()` to prevent the page from scrolling.
 - Added `inert` attribute to the pager when the slider has no overflow, ensuring hidden pager controls are fully removed from keyboard and assistive technology focus.
-- Added support for dynamically showing or hiding slides via `display: none`. Hidden slides are excluded from the slide list, and the MutationObserver now watches for style attribute changes on child elements to refresh accordingly.
+- Added support for dynamically showing or hiding slides via `display: none`.
+  Hidden slides are excluded from the slide list, and the MutationObserver now watches for style attribute changes on child elements to refresh accordingly.
 
 ### Fixed
 
@@ -31,13 +44,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed loop navigation getting stuck when the track contains invalid elements (such as `<template>` or `<script>` tags). Navigation now uses the filtered slides list instead of raw DOM siblings.
+- Fixed loop navigation getting stuck when the track contains invalid elements (such as `<template>` or `<script>` tags).
+  Navigation now uses the filtered slides list instead of raw DOM siblings.
 
 ## [2.2.0] - 2026-04-11
 
 ### Added
 
-- Added a `loop` option (and `data-loop` attribute). When enabled, navigation buttons never disable and the slider wraps from the last slide back to the first and vice versa. Available as a modifier in the AlpineJS integration (`x-snap-slider.loop`).
+- Added a `loop` option (and `data-loop` attribute).
+  When enabled, navigation buttons never disable and the slider wraps from the last slide back to the first and vice versa.
+  Available as a modifier in the AlpineJS integration (`x-snap-slider.loop`).
 
 ### Fixed
 
@@ -71,7 +87,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial Release 🎉
 
-[Unreleased]: https://github.com/fylgja/snap-slider/compare/2.2.3...HEAD
+[Unreleased]: https://github.com/fylgja/snap-slider/compare/2.2.4...HEAD
+[2.2.4]: https://github.com/fylgja/snap-slider/compare/2.2.3...2.2.4
 [2.2.3]: https://github.com/fylgja/snap-slider/compare/2.2.2...2.2.3
 [2.2.2]: https://github.com/fylgja/snap-slider/compare/2.2.1...2.2.2
 [2.2.1]: https://github.com/fylgja/snap-slider/compare/2.2.0...2.2.1

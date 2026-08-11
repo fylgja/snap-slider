@@ -1,14 +1,14 @@
 {
   "name": "@fylgja/snap-slider",
-  "version": "2.2.3",
+  "version": "2.2.4",
   "description": "A CSS-powered slider/carousel, enhanced with JavaScript for improved functionality and accessibility",
   "homepage": "https://fylgja.dev/",
   "author": "Fylgja",
   "license": "MIT",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
-  "unpkg": "dist/custom-element/index.min.js",
-  "jsdelivr": "dist/custom-element/index.min.js",
+  "unpkg": "dist/custom-element/cdn.min.js",
+  "jsdelivr": "dist/custom-element/cdn.min.js",
   "exports": {
     ".": {
       "import": "./dist/index.js",
@@ -39,11 +39,14 @@
     "custom-element"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "prebuid": "rm -rf ./dist",
-    "build": "node ./scripts/build.js"
+    "test": "vitest run",
+    "dev": "node ./scripts/build.js && vite",
+    "build": "rm -rf ./dist && node ./scripts/build.js"
   },
   "devDependencies": {
-    "esbuild": "^0.28.1"
+    "esbuild": "^0.28.1",
+    "jsdom": "^30.0.1",
+    "vite": "^8.2.1",
+    "vitest": "^4.1.10"
   }
 }
