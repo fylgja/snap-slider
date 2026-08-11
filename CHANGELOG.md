@@ -12,7 +12,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed the MutationObserver refreshing the slider on any DOM change inside a slide. A refresh is now limited to child changes on the track itself, and to style changes on its direct children. Nested components that insert or remove elements (such as a swatch tooltip) no longer rebuild the pager.
-- Fixed the `unpkg` and `jsdelivr` fields pointing to a file the build does not emit, which left both CDN entry points returning a 404. They now resolve to `dist/custom-element/cdn.min.js`.
 
 ## [2.2.3] - 2026-07-09
 
