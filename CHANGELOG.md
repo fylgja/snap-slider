@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed the MutationObserver refreshing the slider on any DOM change inside a slide. A refresh is now limited to child changes on the track itself, and to style changes on its direct children. Nested components that insert or remove elements (such as a swatch tooltip) no longer rebuild the pager.
+
 ## [2.2.3] - 2026-07-09
 
 ### Added

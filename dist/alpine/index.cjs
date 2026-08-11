@@ -295,7 +295,7 @@ var SnapSlider = class {
   }
   setupMutationObserver() {
     this.mutationObserver = new MutationObserver((mutations) => {
-      if (mutations.some((m) => m.type === "childList" || m.target.parentElement === this.track)) {
+      if (mutations.some((m) => m.type === "childList" ? m.target === this.track : m.target.parentElement === this.track)) {
         this.refreshSlides();
       }
     });
